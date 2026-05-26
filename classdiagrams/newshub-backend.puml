@@ -1,0 +1,496 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide circle
+
+package "Models/Entities" #E1F5FE {
+    class UserEntity {
+      -id: Long
+      -login: String
+      -email: String
+      -password: String
+      -role: UserRole
+      -isBlocked: boolean
+      -subscribedCategories: List<CategoryEntity> = new ArrayList<>()
+      -subscribedAuthors: List<UserEntity> = new ArrayList<>()
+      --
+      +UserEntity()
+      +UserEntity(login: String, email: String, password: String, role: UserRole)
+      +getId(): Long
+      +setId(id: Long): void
+      +getLogin(): String
+      +setLogin(login: String): void
+      +getEmail(): String
+      +setEmail(email: String): void
+      +getPassword(): String
+      +setPassword(password: String): void
+      +getRole(): UserRole
+      +setRole(role: UserRole): void
+      +isBlocked(): boolean
+      +setBlocked(blocked: boolean): void
+      +getSubscribedCategories(): List<CategoryEntity>
+      +setSubscribedCategories(subscribedCategories: List<CategoryEntity>): void
+      +getSubscribedAuthors(): List<UserEntity>
+      +setSubscribedAuthors(subscribedAuthors: List<UserEntity>): void
+    }
+
+    class CategoryEntity {
+      -id: Long
+      -name: String
+      --
+      +CategoryEntity()
+      +CategoryEntity(name: String)
+      +getId(): Long
+      +setId(id: Long): void
+      +getName(): String
+      +setName(name: String): void
+    }
+
+    class NewsEntity {
+      -id: Long
+      -title: String
+      -content: String
+      -author: UserEntity
+      -category: CategoryEntity
+      -createdAt: LocalDateTime
+      --
+      +NewsEntity()
+      +NewsEntity(title: String, content: String, author: UserEntity, category: CategoryEntity)
+      +getId(): Long
+      +setId(id: Long): void
+      +getTitle(): String
+      +setTitle(title: String): void
+      +getContent(): String
+      +setContent(content: String): void
+      +getAuthor(): UserEntity
+      +setAuthor(author: UserEntity): void
+      +getCategory(): CategoryEntity
+      +setCategory(category: CategoryEntity): void
+      +getCreatedAt(): LocalDateTime
+      +setCreatedAt(createdAt: LocalDateTime): void
+    }
+}
+
+package "Repositories" #FFF9C4 {
+    interface UserRepository {
+      ~findByLogin(login: String): Optional<UserEntity>
+      ~existsByLogin(login: String): boolean
+      ~existsByEmail(email: String): boolean
+      ~findAllAuthors(): List<UserEntity>
+      ~isSubscribedToCategory(userId: Long, categoryId: Long): boolean
+      ~isSubscribedToAuthor(userId: Long, authorId: Long): boolean
+      ~findAllNonAdminsWithLoginFilter(loginFilter: String, pageable: Pageable): Page<UserEntity>
+      ~removeUserCategorySubscription(categoryId: Long): void
+    }
+
+    interface NewsRepository {
+      ~searchByKeyword(query: String, pageable: Pageable): Page<NewsEntity>
+      ~filter(categoryIds: List<Long>, authorIds: List<Long>, pageable: Pageable): Page<NewsEntity>
+      ~updateNewsCategoryId(oldCategoryId: Long, newCategoryId: Long): void
+    }
+
+    interface CategoryRepository {
+      ~existsByName(name: String): boolean
+      ~findByName(name: String): Optional<CategoryEntity>
+    }
+}
+
+package "Services" #C8E6C9 {
+    class NewsService {
+      -newsRepository: NewsRepository
+      -categoryRepository: CategoryRepository
+      -userRepository: UserRepository
+      -newsWebSocketController: NewsWebSocketController
+      -mapper: NewsHubMapper
+      --
+      +NewsService(newsRepository: NewsRepository, categoryRepository: CategoryRepository, userRepository: UserRepository, newsWebSocketController: NewsWebSocketController, mapper: NewsHubMapper)
+      +search(query: String, page: int): Page<NewsPreviewDTO>
+      +filter(categoryIds: List<Long>, authorIds: List<Long>, page: int): Page<NewsPreviewDTO>
+      +create(data: NewsInputDTO, currentUser: AuthenticatedUserDTO): NewsDTO
+      +update(id: Long, data: NewsInputDTO, currentUser: AuthenticatedUserDTO): NewsDTO
+      +delete(id: Long, currentUser: AuthenticatedUserDTO): void
+      +read(id: Long): NewsDTO
+    }
+
+    class UserService {
+      -userRepository: UserRepository
+      -categoryRepository: CategoryRepository
+      -mapper: NewsHubMapper
+      --
+      +UserService(userRepository: UserRepository, categoryRepository: CategoryRepository, mapper: NewsHubMapper)
+      +subscribeToCategory(currentUser: AuthenticatedUserDTO, categoryId: Long): SubscriptionsDTO
+      +unsubscribeFromCategory(currentUser: AuthenticatedUserDTO, categoryId: Long): SubscriptionsDTO
+      +subscribeToAuthor(currentUser: AuthenticatedUserDTO, authorId: Long): SubscriptionsDTO
+      +unsubscribeFromAuthor(currentUser: AuthenticatedUserDTO, authorId: Long): SubscriptionsDTO
+      +getSubscriptions(currentUser: AuthenticatedUserDTO): SubscriptionsDTO
+      +updateUserStatus(userId: Long, isBlocked: boolean): UserDTO
+      +changeRole(userId: Long, newRole: String): UserDTO
+      +getUserData(userId: Long): UserDTO
+      +getAllAuthors(): List<UserDTO>
+      +getUserById(userId: Long): UserEntity
+      +addCategorySubscriptionById(userId: Long, categoryId: Long): void
+      +removeCategorySubscriptionById(userId: Long, categoryId: Long): void
+      +addAuthorSubscriptionById(userId: Long, authorId: Long): void
+      +removeAuthorSubscriptionById(userId: Long, authorId: Long): void
+      +getAllNonAdminsWithLoginFilter(loginFilter: String, pageable: Pageable): Page<UserDTO>
+    }
+
+    class CategoryService {
+      -categoryRepository: CategoryRepository
+      -newsRepository: NewsRepository
+      -userRepository: UserRepository
+      -mapper: NewsHubMapper
+      -{static} DEFAULT_CATEGORY_NAME: String = "DEFAULT"
+      --
+      +CategoryService(categoryRepository: CategoryRepository, newsRepository: NewsRepository, userRepository: UserRepository, mapper: NewsHubMapper)
+      +getAll(): List<CategoryDTO>
+      +read(id: Long): CategoryDTO
+      +add(name: String): CategoryDTO
+      +update(id: Long, name: String): CategoryDTO
+      +remove(id: Long): void
+    }
+
+    class AuthService {
+      -userRepository: UserRepository
+      -passwordEncoder: PasswordEncoder
+      -authenticationManager: AuthenticationManager
+      -jwtUtil: JwtUtil
+      -mapper: NewsHubMapper
+      --
+      +AuthService(userRepository: UserRepository, passwordEncoder: PasswordEncoder, authenticationManager: AuthenticationManager, jwtUtil: JwtUtil, mapper: NewsHubMapper)
+      +register(data: RegisterRequestDTO): AuthResponseDTO
+      +authenticate(credentials: LoginDTO): AuthResponseDTO
+      -buildResponse(dto: UserDTO): AuthResponseDTO
+    }
+}
+
+package "Controllers" #BBDEFB {
+    class AdminController {
+      -categoryService: CategoryService
+      -userService: UserService
+      --
+      +AdminController(categoryService: CategoryService, userService: UserService)
+      +getAllNonAdminUsers(loginFilter: String, pageable: Pageable): Page<UserDTO>
+      +blockUser(userId: Long): UserDTO
+      +unblockUser(userId: Long): UserDTO
+      +changeUserRole(userId: Long, newRole: String): UserDTO
+      +addCategory(name: String): CategoryDTO
+      +updateCategory(id: Long, name: String): CategoryDTO
+      +deleteCategory(id: Long): String
+    }
+
+    class AuthController {
+      -authService: AuthService
+      --
+      +AuthController(authService: AuthService)
+      +register(data: RegisterRequestDTO): AuthResponseDTO
+      +login(credentials: LoginDTO): AuthResponseDTO
+    }
+
+    class AuthorController {
+      -newsService: NewsService
+      --
+      +AuthorController(newsService: NewsService)
+      +createNews(data: NewsInputDTO, userDetails: AuthenticatedUserDTO): NewsDTO
+      +updateNews(id: Long, data: NewsInputDTO, userDetails: AuthenticatedUserDTO): NewsDTO
+      +deleteNews(id: Long, userDetails: AuthenticatedUserDTO): String
+    }
+
+    class PublicController {
+      -categoryService: CategoryService
+      -newsService: NewsService
+      -userService: UserService
+      --
+      +PublicController(categoryService: CategoryService, newsService: NewsService, userService: UserService)
+      +searchNews(query: String, page: int): Page<NewsPreviewDTO>
+      +filterNews(categoryIds: List<Long>, authorIds: List<Long>, page: int): Page<NewsPreviewDTO>
+      +getAllCategories(): List<CategoryDTO>
+      +getCategory(id: Long): CategoryDTO
+      +getNewsDetails(id: Long): NewsDTO
+      +getAllAuthors(): List<UserDTO>
+    }
+
+    class UserController {
+      -userService: UserService
+      --
+      +UserController(userService: UserService)
+      +subscribeToCategory(categoryId: Long, userDetails: AuthenticatedUserDTO): SubscriptionsDTO
+      +subscribeToAuthor(authorId: Long, userDetails: AuthenticatedUserDTO): SubscriptionsDTO
+      +unsubscribeFromCategory(categoryId: Long, userDetails: AuthenticatedUserDTO): SubscriptionsDTO
+      +unsubscribeFromAuthor(authorId: Long, userDetails: AuthenticatedUserDTO): SubscriptionsDTO
+      +getMySubscriptions(userDetails: AuthenticatedUserDTO): SubscriptionsDTO
+    }
+
+    class NewsWebSocketController {
+      -messagingTemplate: SimpMessagingTemplate
+      --
+      +NewsWebSocketController(messagingTemplate: SimpMessagingTemplate)
+      +sendNewsUpdate(newsDTO: NewsPreviewDTO): void
+      +sendNewsCreate(newsDTO: NewsPreviewDTO): void
+      +sendNewsDelete(id: Long): void
+    }
+}
+
+package "Security & Config" #F8BBD0 {
+    class WebSocketConfig {
+      +configureMessageBroker(config: MessageBrokerRegistry): void
+      +registerStompEndpoints(registry: StompEndpointRegistry): void
+    }
+
+    class CustomUserDetailsService {
+      -userRepository: UserRepository
+      --
+      +CustomUserDetailsService(userRepository: UserRepository)
+      +loadUserByUsername(username: String): UserDetails
+    }
+
+    class JwtUtil {
+      -jwtSecret: String
+      -jwtExpiration: String
+      --
+      +generateToken(username: String, role: String, userId: Long): String
+      +extractUsername(token: String): String
+      +extractRole(token: String): String
+      +extractUserId(token: String): Long
+      +validateToken(token: String): boolean
+    }
+
+    class CustomUserDetails {
+      -user: UserEntity
+      -authorities: Collection<? extends GrantedAuthority>
+      --
+      +CustomUserDetails(user: UserEntity)
+      +getUserEntity(): UserEntity
+      +getUsername(): String
+      +getPassword(): String
+      +getAuthorities(): Collection<? extends GrantedAuthority>
+      +isAccountNonExpired(): boolean
+      +isAccountNonLocked(): boolean
+      +isCredentialsNonExpired(): boolean
+      +isEnabled(): boolean
+    }
+
+    class JwtAuthenticationFilter {
+      -jwtUtil: JwtUtil
+      -resolver: HandlerExceptionResolver
+      -{static} BEARER_PREFIX: String = "Bearer "
+      -{static} AUTHORIZATION_HEADER: String = "Authorization"
+      --
+      +JwtAuthenticationFilter(jwtUtil: JwtUtil, resolver: HandlerExceptionResolver)
+      #doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain): void
+    }
+
+    class SecurityConfig {
+      -customUserDetailsService: CustomUserDetailsService
+      -jwtUtil: JwtUtil
+      -resolver: HandlerExceptionResolver
+      --
+      +SecurityConfig(customUserDetailsService: CustomUserDetailsService, jwtUtil: JwtUtil, resolver: HandlerExceptionResolver)
+      +passwordEncoder(): PasswordEncoder
+      +authenticationManager(http: HttpSecurity): AuthenticationManager
+      +jwtAuthenticationFilter(): JwtAuthenticationFilter
+      +filterChain(http: HttpSecurity): SecurityFilterChain
+    }
+}
+
+package "Exceptions & Handlers" #FFCCBC {
+    class ResourceNotFoundException {
+      +ResourceNotFoundException(message: String)
+    }
+
+    class BadRequestException {
+      +BadRequestException(message: String)
+    }
+
+    class ResourceAlreadyExistsException {
+      +ResourceAlreadyExistsException(message: String)
+      +ResourceAlreadyExistsException(message: String, cause: Throwable)
+    }
+
+    class CustomAccessDeniedException {
+      +CustomAccessDeniedException(message: String)
+    }
+
+    class GlobalExceptionHandler {
+      +handleResourceNotFound(ex: ResourceNotFoundException): ErrorResponse
+      +handleNoResourceFound(ex: org.springframework.web.servlet.resource.NoResourceFoundException): ErrorResponse
+      +handleBadRequest(ex: BadRequestException): ErrorResponse
+      +handleValidationException(ex: MethodArgumentNotValidException): ErrorResponse
+      +handleTypeMismatch(ex: MethodArgumentTypeMismatchException): ErrorResponse
+      +handleMissingParams(ex: org.springframework.web.bind.MissingServletRequestParameterException): ErrorResponse
+      +handleMethodNotSupported(ex: org.springframework.web.HttpRequestMethodNotSupportedException): ErrorResponse
+      +handleBadCredentials(ex: BadCredentialsException): ErrorResponse
+      +handleAuthenticationException(ex: AuthenticationException): ErrorResponse
+      +handleInvalidToken(ex: JwtException): ErrorResponse
+      +handleAccessDeniedException(ex: org.springframework.security.access.AccessDeniedException): ErrorResponse
+      +handleCustomAccessDenied(ex: CustomAccessDeniedException): ErrorResponse
+      +handleResourceAlreadyExists(ex: ResourceAlreadyExistsException): ErrorResponse
+      +handleDataIntegrityViolation(ex: org.springframework.dao.DataIntegrityViolationException): ErrorResponse
+      +handleLocked(ex: LockedException): ErrorResponse
+      +handleDataAccessException(ex: org.springframework.dao.DataAccessException): ErrorResponse
+      +handleJDBCConnectionException(ex: org.hibernate.exception.JDBCConnectionException): ErrorResponse
+      +handleGeneralException(ex: Exception): ErrorResponse
+    }
+}
+
+package "Mappers & Utils" #D1C4E9 {
+    class NewsHubMapper {
+      +toUserDTO(entity: UserEntity): UserDTO
+      +toCategoryDTO(entity: CategoryEntity): CategoryDTO
+      +toNewsPreviewDTO(entity: NewsEntity): NewsPreviewDTO
+      +toNewsDTO(entity: NewsEntity): NewsDTO
+      -getSummary(content: String): String
+    }
+
+    class AdminInitializer {
+      -{static} logger: Logger = Logger.getLogger(AdminInitializer.class.getName())
+      -userRepository: UserRepository
+      -passwordEncoder: PasswordEncoder
+      -adminLogin: String
+      -adminPassword: String
+      -adminEmail: String
+      --
+      +AdminInitializer(userRepository: UserRepository, passwordEncoder: PasswordEncoder)
+      +run(args: String): void
+    }
+
+    class NewshubApplication {
+      +{static} main(args: String[]): void
+    }
+}
+
+package "DTOs" #F0F0F0 {
+  class UserDTO <<record>> {
+    +id: Long
+    +login: String
+    +role: UserRole
+    +isBlocked: boolean
+  }
+
+  class LoginDTO <<record>> {
+    +login: String
+    +password: String
+  }
+
+  class RegisterRequestDTO <<record>> {
+    +login: String
+    +email: String
+    +password: String
+  }
+
+  class AuthResponseDTO <<record>> {
+    +token: String
+    +user: UserDTO
+  }
+
+  class AuthenticatedUserDTO <<record>> {
+    +id: Long
+    +login: String
+    +role: UserRole
+  }
+
+  class NewsDTO <<record>> {
+    +id: Long
+    +title: String
+    +summary: String
+    +content: String
+    +author: UserDTO
+    +category: CategoryDTO
+    +createdAt: LocalDateTime
+  }
+
+  class NewsPreviewDTO <<record>> {
+    +id: Long
+    +title: String
+    +summary: String
+    +author: UserDTO
+    +category: CategoryDTO
+    +createdAt: LocalDateTime
+  }
+
+  class NewsInputDTO <<record>> {
+    +title: String
+    +content: String
+    +categoryId: Long
+  }
+
+  class CategoryDTO <<record>> {
+    +id: Long
+    +name: String
+  }
+
+  class SubscriptionsDTO <<record>> {
+    +categories: List<CategoryDTO>
+    +authors: List<UserDTO>
+  }
+}
+
+UserEntity o-- CategoryEntity
+UserEntity o-- UserEntity
+NewsEntity *-- UserEntity
+NewsEntity *-- CategoryEntity
+NewsService *-- NewsRepository
+NewsService *-- CategoryRepository
+NewsService *-- UserRepository
+NewsService *-- NewsWebSocketController
+NewsService *-- NewsHubMapper
+UserService *-- UserRepository
+UserService *-- CategoryRepository
+UserService *-- NewsHubMapper
+UserService ..> UserEntity
+CategoryService *-- CategoryRepository
+CategoryService *-- NewsRepository
+CategoryService *-- UserRepository
+CategoryService *-- NewsHubMapper
+AuthService *-- UserRepository
+AuthService *-- JwtUtil
+AuthService *-- NewsHubMapper
+AdminController *-- CategoryService
+AdminController *-- UserService
+AuthController *-- AuthService
+AuthorController *-- NewsService
+PublicController *-- CategoryService
+PublicController *-- NewsService
+PublicController *-- UserService
+UserController *-- UserService
+CustomUserDetailsService *-- UserRepository
+CustomUserDetails *-- UserEntity
+JwtAuthenticationFilter *-- JwtUtil
+SecurityConfig *-- CustomUserDetailsService
+SecurityConfig *-- JwtUtil
+SecurityConfig ..> JwtAuthenticationFilter
+GlobalExceptionHandler ..> ResourceNotFoundException
+GlobalExceptionHandler ..> BadRequestException
+GlobalExceptionHandler ..> CustomAccessDeniedException
+GlobalExceptionHandler ..> ResourceAlreadyExistsException
+NewsHubMapper ..> UserEntity
+NewsHubMapper ..> CategoryEntity
+NewsHubMapper ..> NewsEntity
+NewsHubMapper ..> UserDTO
+NewsHubMapper ..> CategoryDTO
+NewsHubMapper ..> NewsPreviewDTO
+NewsHubMapper ..> NewsDTO
+NewsHubMapper ..> SubscriptionsDTO
+
+AuthResponseDTO *-- UserDTO
+NewsDTO *-- UserDTO
+NewsDTO *-- CategoryDTO
+NewsPreviewDTO *-- UserDTO
+NewsPreviewDTO *-- CategoryDTO
+SubscriptionsDTO o-- CategoryDTO
+SubscriptionsDTO o-- UserDTO
+
+AdminController ..> UserDTO
+AdminController ..> CategoryDTO
+AuthController ..> AuthResponseDTO
+AuthController ..> LoginDTO
+AuthController ..> RegisterRequestDTO
+AuthorController ..> NewsDTO
+AuthorController ..> NewsInputDTO
+PublicController ..> NewsDTO
+PublicController ..> NewsPreviewDTO
+PublicController ..> CategoryDTO
+PublicController ..> UserDTO
+UserController ..> SubscriptionsDTO
+
+AdminInitializer *-- UserRepository
+@enduml

@@ -1,0 +1,396 @@
+@startuml
+!theme plain
+skinparam classBackgroundColor #E7F3FF
+skinparam classBorderColor #0066CC
+skinparam arrowColor #0066CC
+skinparam noteBackgroundColor #FFFFCC
+skinparam noteBorderColor #FF9900
+
+title
+  NewsHub Frontend Architecture
+  <size:14>Angular 21 Application</size>
+end title
+
+' ============== HTML TEMPLATES (View Layer) ==============
+package "HTML Templates" #FFE6E6 {
+    class "index.html" as html_index << (H,#FFAAAA) HTML >>
+    note right of html_index
+        Root HTML Entry Point
+        - Contains app-root outlet
+    end note
+
+    class "app.component.html" as html_app << (H,#FFAAAA) HTML >>
+    class "home.component.html" as html_home << (H,#FFAAAA) HTML >>
+    class "login.component.html" as html_login << (H,#FFAAAA) HTML >>
+    class "register.component.html" as html_register << (H,#FFAAAA) HTML >>
+    class "news-detail.component.html" as html_detail << (H,#FFAAAA) HTML >>
+    class "create-news.component.html" as html_create << (H,#FFAAAA) HTML >>
+    class "my-news.component.html" as html_mynews << (H,#FFAAAA) HTML >>
+    class "subscriptions.component.html" as html_subs << (H,#FFAAAA) HTML >>
+    class "admin.component.html" as html_admin << (H,#FFAAAA) HTML >>
+}
+
+' ============== SERVICE/COMPONENT LAYER ==============
+package "Angular Components & Services" #E6F3FF {
+    class "AppService" as app_service {
+        - errorAPI: ErrorAPI
+        - authAPI: AuthAPI
+        --
+        Rendered by: index.html -> app-root
+    }
+
+    class "HomeService" as home_service {
+        - newsAPI: NewsAPI
+        - userAPI: UserAPI
+        - wsAPI: WebSocketAPI
+        - authService: AuthAPI
+        --
+        + newsItems: Signal<NewsPreviewDTO\\u005B\\u005D>
+        + categories: Signal<CategoryDTO\\u005B\\u005D>
+        + subscribedCategoryIds: Signal<number\\u005B\\u005D>
+        + page: Signal<number>
+        + totalPages: Signal<number>
+        --
+        + loadInitialData()
+        + setupWebSockets()
+        + loadNews()
+        + onSearch()
+        + toggleCategory()
+        + toggleAuthor()
+        + subscribeToCategory()
+        + unsubscribeFromCategory()
+        --
+        Renders: home.component.html
+    }
+
+    class "LoginService" as login_service {
+        - authAPI: AuthAPI
+        - router: Router
+        --
+        + loginData: object
+        + loading: Signal<boolean>
+        --
+        + onLogin()
+        --
+        Renders: login.component.html
+    }
+
+    class "RegisterService" as register_service {
+        - authAPI: AuthAPI
+        - router: Router
+        --
+        + regData: object
+        + loading: Signal<boolean>
+        --
+        + onRegister()
+        --
+        Renders: register.component.html
+    }
+
+    class "NewsDetailService" as detail_service {
+        - newsAPI: NewsAPI
+        + newsDetail: Signal<NewsDTO>
+        + loading: Signal<boolean>
+        --
+        + loadNews()
+        --
+        Renders: news-detail.component.html
+    }
+
+    class "CreateNewsService" as create_service {
+        - newsAPI: NewsAPI
+        - router: Router
+        --
+        + newsData: NewsInputDTO
+        + loading: Signal<boolean>
+        --
+        + createNews()
+        --
+        Renders: create-news.component.html
+    }
+
+    class "MyNewsService" as mynews_service {
+        - newsAPI: NewsAPI
+        --
+        + userNews: Signal<NewsDTO[]>
+        --
+        + loadMyNews()
+        --
+        Renders: my-news.component.html
+    }
+
+    class "SubscriptionsService" as subs_service {
+        - userAPI: UserAPI
+        --
+        + subscriptions: Signal<SubscriptionsDTO>
+        --
+        + loadSubscriptions()
+        + unsubscribeCategory()
+        + unsubscribeAuthor()
+        --
+        Renders: subscriptions.component.html
+    }
+
+    class "AdminService" as admin_service {
+        - adminAPI: AdminAPI
+        --
+        + users: Signal<UserDTO[]>
+        + categories: Signal<CategoryDTO[]>
+        --
+        + loadUsers()
+        + blockUser()
+        + changeUserRole()
+        + addCategory()
+        --
+        Renders: admin.component.html
+    }
+}
+
+' ============== API/HTTP LAYER ==============
+package "API Services (HTTP & WebSocket)" #E6FFE6 {
+    class "AuthAPI" as auth_api {
+        - http: HttpClient
+        - baseUrl: string
+        --
+        - userSignal: Signal<UserDTO | null>
+        + user: Signal<UserDTO | null>
+        --
+        + register(data): Observable<AuthResponseDTO>
+        + login(credentials): Observable<AuthResponseDTO>
+        + logout()
+        - handleAuth()
+        - getStoredUser()
+    }
+
+    class "NewsAPI" as news_api {
+        - http: HttpClient
+        - baseUrl: string
+        --
+        + searchNews(query, page): Observable<Page<NewsPreviewDTO>>
+        + filterNews(categoryIds, authorIds, page): Observable<Page<NewsPreviewDTO>>
+        + getCategories(): Observable<CategoryDTO[]>
+        + getAuthors(): Observable<UserDTO[]>
+        + getNewsDetails(id): Observable<NewsDTO>
+    }
+
+    class "UserAPI" as user_api {
+        - http: HttpClient
+        - baseUrl: string
+        --
+        + subscribeToCategory(categoryId): Observable<SubscriptionsDTO>
+        + unsubscribeFromCategory(categoryId): Observable<SubscriptionsDTO>
+        + subscribeToAuthor(authorId): Observable<SubscriptionsDTO>
+        + unsubscribeFromAuthor(authorId): Observable<SubscriptionsDTO>
+        + getSubscriptions(): Observable<SubscriptionsDTO>
+    }
+
+    class "AdminAPI" as admin_api {
+        - http: HttpClient
+        - baseUrl: string
+        --
+        + blockUser(userId): Observable<UserDTO>
+        + unblockUser(userId): Observable<UserDTO>
+        + changeUserRole(userId, newRole): Observable<UserDTO>
+        + addCategory(name): Observable<CategoryDTO>
+        + updateCategory(id, name): Observable<CategoryDTO>
+        + deleteCategory(id): Observable<string>
+    }
+
+    class "AuthorAPI" as author_api {
+        - http: HttpClient
+        --
+        + createNews(data): Observable<NewsDTO>
+        + updateNews(id, data): Observable<NewsDTO>
+        + deleteNews(id): Observable<string>
+    }
+
+    class "ErrorAPI" as error_api {
+        - http: HttpClient
+        --
+        - errorSignal: Signal<string | null>
+        + error: Signal<string | null>
+        --
+        + setError(message)
+        + clearError()
+    }
+
+    class "WebSocketAPI" as ws_api {
+        - stompClient: Client
+        --
+        + newsCreated$: Subject<NewsPreviewDTO>
+        + newsUpdated$: Subject<NewsPreviewDTO>
+        + newsDeleted$: Subject<number>
+        --
+        - connect()
+        + disconnect()
+    }
+}
+
+' ============== DATA MODELS ==============
+package "Data Models (DTOs & Interfaces)" #F0E6FF {
+    interface "UserDTO" as dto_user {
+        + id: number
+        + login: string
+        + role: UserRole
+        + isBlocked: boolean
+    }
+
+    interface "AuthResponseDTO" as dto_auth {
+        + token: string
+        + user: UserDTO
+    }
+
+    interface "CategoryDTO" as dto_category {
+        + id: number
+        + name: string
+    }
+
+    interface "NewsDTO" as dto_news {
+        + id: number
+        + title: string
+        + summary: string
+        + content: string
+        + author: UserDTO
+        + category: CategoryDTO
+        + createdAt: string
+    }
+
+    interface "NewsPreviewDTO" as dto_preview {
+        + id: number
+        + title: string
+        + summary: string
+        + author: UserDTO
+        + category: CategoryDTO
+        + createdAt: string
+    }
+
+    interface "NewsInputDTO" as dto_input {
+        + title: string
+        + content: string
+        + categoryId: number
+    }
+
+    interface "SubscriptionsDTO" as dto_subs {
+        + categories: CategoryDTO[]
+        + authors: UserDTO[]
+    }
+
+    interface "Page<T>" as dto_page {
+        + content: T[]
+        + totalPages: number
+        + totalElements: number
+        + size: number
+        + number: number
+    }
+
+    enum "UserRole" as enum_role {
+        USER
+        AUTHOR
+        ADMIN
+    }
+}
+
+' ============== ROUTING ==============
+package "Routing" #FFE6F0 {
+    class "Routes" as routes {
+        + '' -> HomeService
+        + 'news/:id' -> NewsDetailService
+        + 'login' -> LoginService
+        + 'register' -> RegisterService
+        + 'subscriptions' -> SubscriptionsService
+        + 'create-news' -> CreateNewsService
+        + 'my-news' -> MyNewsService
+        + 'admin' -> AdminService
+        + '**' -> redirect to ''
+    }
+}
+
+' ============== RELATIONSHIPS ==============
+
+' HTML to Components
+html_app ..> app_service
+html_home ..> home_service
+html_login ..> login_service
+html_register ..> register_service
+html_detail ..> detail_service
+html_create ..> create_service
+html_mynews ..> mynews_service
+html_subs ..> subs_service
+html_admin ..> admin_service
+
+' App Service relationships
+app_service --> error_api
+app_service --> auth_api
+
+' Home Service relationships
+home_service --> news_api
+home_service --> user_api
+home_service --> ws_api
+home_service --> auth_api
+
+' Component to API relationships
+login_service --> auth_api
+register_service --> auth_api
+detail_service --> news_api
+create_service --> author_api
+mynews_service --> news_api
+subs_service --> user_api
+admin_service --> admin_api
+
+' API to Models
+auth_api ..> dto_auth
+auth_api ..> dto_user
+news_api ..> dto_preview
+news_api ..> dto_news
+news_api ..> dto_category
+news_api ..> dto_page
+user_api ..> dto_subs
+user_api ..> dto_category
+admin_api ..> dto_user
+admin_api ..> dto_category
+ws_api ..> dto_preview
+error_api ..> dto_user
+
+' Model relationships
+dto_auth --> dto_user
+dto_news --> dto_user
+dto_news --> dto_category
+dto_preview --> dto_user
+dto_preview --> dto_category
+dto_subs --> dto_category
+dto_subs --> dto_user
+dto_user --> enum_role
+dto_page ..> dto_preview
+
+' WebSocket subscriptions
+ws_api ..> news_api
+
+' Routing
+routes -.-> home_service
+routes -.-> login_service
+routes -.-> register_service
+routes -.-> detail_service
+routes -.-> create_service
+routes -.-> mynews_service
+routes -.-> subs_service
+routes -.-> admin_service
+
+note right of routes
+    Angular Router Configuration
+    Maps URLs to Components
+    Handles navigation & redirects
+end note
+
+' ============== LEGEND ==============
+note bottom
+    **Component Type Legend:**
+    - __Service Classes__: Angular components with @Component decorator
+    - __API Classes__: HTTP/WebSocket communication services (@Injectable)
+    - __Models__: TypeScript interfaces & enums
+    - __HTML__: Template files rendered by components
+    - **Solid Arrow**: Direct dependency/injection
+    - **Dotted Arrow**: Usage/implements relationship
+    - **Dashed Arrow**: Navigation/routing relationship
+end note
+
+@enduml
