@@ -1,0 +1,31 @@
+<div class="app-container">
+  <header class="top-header" *ngIf="errorAPI.error()">
+    <div class="error-banner">
+      {{ errorAPI.error() }}
+      <button (click)="errorAPI.clearError()" class="close-btn">×</button>
+    </div>
+  </header>
+
+  <nav class="main-nav">
+    <a routerLink="/" class="logo">NewsHub</a>
+    <div class="nav-links">
+      <a routerLink="/">Feed</a>
+      <ng-container *ngIf=" authAPI.user() as user; else guest">
+        <a routerLink="/subscriptions">My Subscriptions</a>
+        <a *ngIf="['AUTHOR', 'ADMIN'].includes(user.role)" routerLink="/my-news">My News</a>
+        <a *ngIf="['AUTHOR', 'ADMIN'].includes(user.role)" routerLink="/create-news">Create News</a>
+        <a *ngIf="user.role === 'ADMIN'" routerLink="/admin">Admin Panel</a>
+        <span class="user-info">{{ user.login }} ({{ user.role }})</span>
+        <button (click)="authAPI.logout()" class="nav-btn">Logout</button>
+      </ng-container>
+      <ng-template #guest>
+        <a routerLink="/login">Login</a>
+        <a routerLink="/register">Register</a>
+      </ng-template>
+    </div>
+  </nav>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

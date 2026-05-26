@@ -1,0 +1,5 @@
+.auth-form { max-width: 400px; margin: 4rem auto; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; }
+.field { margin-bottom: 1.5rem; }
+input { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
+button { width: 100%; padding: 0.75rem; background: #2c3e50; color: white; border: none; cursor: pointer; }
+button:disabled { opacity: 0.7; }

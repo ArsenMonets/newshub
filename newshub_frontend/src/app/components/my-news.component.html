@@ -1,0 +1,29 @@
+<div class="my-news-container">
+  <h1>My News</h1>
+
+  <div *ngIf="isLoading()" style="text-align: center; padding: 2rem;">
+    Loading...
+  </div>
+
+  <div *ngIf="!isLoading() && myNews().length === 0" class="empty-message">
+    <p>You haven't created any news yet.</p>
+    <a routerLink="/create-news" style="color: #3498db; text-decoration: none;">Create your first news →</a>
+  </div>
+
+  <div *ngFor="let news of myNews()" class="news-item">
+    <div class="news-header">
+      <div>
+        <h2 class="news-title">{{ news.title }}</h2>
+        <span class="category-tag">{{ news.category.name }}</span>
+      </div>
+    </div>
+    
+    <p class="news-meta">{{ news.createdAt | date:'medium' }}</p>
+    <p class="news-summary"><strong>Summary:</strong> {{ news.summary }}</p>
+    
+    <div class="actions">
+      <button class="btn-edit" (click)="editNews(news)">Edit</button>
+      <button class="btn-delete" (click)="deleteNews(news)">Delete</button>
+    </div>
+  </div>
+</div>

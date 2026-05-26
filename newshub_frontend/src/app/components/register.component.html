@@ -1,0 +1,18 @@
+<div class="auth-form">
+  <h1>Register</h1>
+  <form (submit)="onRegister()">
+    <div class="field">
+      <label>Login</label>
+      <input type="text" [(ngModel)]="regData.login" name="login" required>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="regData.email" name="email" required>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" [(ngModel)]="regData.password" name="password" required>
+    </div>
+    <button type="submit" [disabled]="loading()">Register</button>
+  </form>
+</div>

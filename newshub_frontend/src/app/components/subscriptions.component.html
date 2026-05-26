@@ -1,0 +1,21 @@
+<h1>My Subscriptions</h1>
+
+<div class="subs-grid" *ngIf="subs() as s">
+  <section>
+    <h2>Following Categories</h2>
+    <div *ngFor="let cat of s.categories" class="sub-item">
+      <span>{{ cat.name }}</span>
+      <button (click)="unsubCat(cat.id)">Unsubscribe</button>
+    </div>
+    <p *ngIf="s.categories.length === 0">No category subscriptions</p>
+  </section>
+
+  <section>
+    <h2>Following Authors</h2>
+    <div *ngFor="let author of s.authors" class="sub-item">
+      <span>{{ author.login }}</span>
+      <button (click)="unsubAuthor(author.id)">Unfollow</button>
+    </div>
+    <p *ngIf="s.authors.length === 0">No followed authors</p>
+  </section>
+</div>

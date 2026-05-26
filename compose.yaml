@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: newshub_db
+    environment:
+      POSTGRES_DB: newshub
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - newshub_network
+
+  # Backend (Spring Boot)
+  backend:
+    build:
+      context: ./newshub_backend
+      dockerfile: Dockerfile
+    container_name: newshub_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/newshub
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=mysecretpassword
+      - JWT_SECRET=ThisIsAVeryLongSecretKeyForDevelopmentThatHasAtLeast256BitsOfDataToBeSecure1234567890ABCDEF
+      - JWT_EXPIRATION=900000
+      - ADMIN_LOGIN=admin
+      - ADMIN_PASSWORD=admin123
+      - ADMIN_EMAIL=admin@newshub.com
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - newshub_network
+    restart: unless-stopped
+
+  # Frontend (Angular)
+  frontend:
+    build:
+      context: ./newshub_frontend
+      dockerfile: Dockerfile
+    container_name: newshub_frontend
+    ports:
+      - "4200:80"
+    environment:
+      - API_URL=http://localhost:8080
+    depends_on:
+      - backend
+    networks:
+      - newshub_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  newshub_network:
+    driver: bridge

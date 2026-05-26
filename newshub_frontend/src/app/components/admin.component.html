@@ -1,0 +1,73 @@
+<h1>Admin Control Panel</h1>
+
+<div class="admin-grid">
+  <section>
+    <h2>Categories</h2>
+    <div class="add-cat">
+      <input #catInput type="text" placeholder="New Category Name">
+      <button (click)="addCategory(catInput.value); catInput.value=''">Add</button>
+    </div>
+    <div *ngFor="let cat of categories()" class="list-item">
+      <div *ngIf="editingCategoryId() !== cat.id" style="flex-grow: 1;">
+        <span>{{ cat.name }}</span>
+      </div>
+      <div *ngIf="editingCategoryId() === cat.id" style="display: flex; gap: 0.5rem; flex-grow: 1;">
+        <input 
+          type="text" 
+          [value]="editingCategoryName()"
+          (input)="editingCategoryName.set($event.target.value)"
+          style="flex-grow: 1; padding: 0.3rem; border: 1px solid #ccc; border-radius: 4px;">
+      </div>
+      <div class="item-actions">
+        <button *ngIf="editingCategoryId() !== cat.id" (click)="startEditCategory(cat)" style="background: #f39c12; color: white;">Edit</button>
+        <button *ngIf="editingCategoryId() === cat.id" (click)="saveEditCategory(cat.id, editingCategoryName())" style="background: #27ae60; color: white;">Save</button>
+        <button *ngIf="editingCategoryId() === cat.id" (click)="cancelEditCategory()" style="background: #95a5a6; color: white;">Cancel</button>
+        <button (click)="deleteCategory(cat.id)" style="background: #e74c3c; color: white;">Delete</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Authors / Users</h2>
+    <div style="margin-bottom: 1rem;">
+      <input 
+        type="text" 
+        placeholder="Filter by login..."
+        [value]="loginFilter()"
+        (input)="onLoginFilterChange($event.target.value)"
+        style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div *ngFor="let user of users()" class="list-item">
+      <div class="user-meta">
+        <strong>{{ user.login }}</strong>
+        <span class="role-tag">{{ user.role }}</span>
+        <span class="status-tag" [class.blocked]="user.isBlocked">{{ user.isBlocked ? 'BLOCKED' : 'ACTIVE' }}</span>
+      </div>
+      <div class="item-actions">
+        <button *ngIf="!user.isBlocked" (click)="toggleBlock(user, true)">Block</button>
+        <button *ngIf="user.isBlocked" (click)="toggleBlock(user, false)">Unblock</button>
+        <button *ngIf="user.role === 'USER'" (click)="makeAuthor(user)">Make Author</button>
+        <button *ngIf="user.role === 'AUTHOR'" (click)="returnUserToUser(user)">Return User</button>
+      </div>
+    </div>
+    <div style="margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+      <span *ngIf="usersPage()">
+        Page {{ usersPage()!.number + 1 }} of {{ usersPage()!.totalPages }} 
+        ({{ usersPage()!.totalElements }} users total)
+      </span>
+      <div style="margin-top: 0.5rem;">
+        <button 
+          [disabled]="!usersPage() || usersPage()!.number === 0"
+          (click)="goToPage(currentPage() - 1)"
+          style="margin-right: 0.5rem;">
+          Previous
+        </button>
+        <button 
+          [disabled]="!usersPage() || usersPage()!.number >= usersPage()!.totalPages - 1"
+          (click)="goToPage(currentPage() + 1)">
+          Next
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

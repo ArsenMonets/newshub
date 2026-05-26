@@ -1,0 +1,14 @@
+<div class="auth-form">
+  <h1>Login</h1>
+  <form (submit)="onLogin()">
+    <div class="field">
+      <label>Username (Login)</label>
+      <input type="text" [(ngModel)]="loginData.login" name="login" required>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" [(ngModel)]="loginData.password" name="password" required>
+    </div>
+    <button type="submit" [disabled]="loading()">Login</button>
+  </form>
+</div>

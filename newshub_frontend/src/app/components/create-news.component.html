@@ -1,0 +1,23 @@
+<div class="editor-form">
+  <h1>{{ editingNewsId() ? 'Edit News' : 'Create New News' }}</h1>
+  <form (submit)="onCreate()">
+    <div class="field">
+      <label>Title</label>
+      <input type="text" [(ngModel)]="newsInput.title" name="title" required>
+    </div>
+    
+    <div class="field">
+      <label>Category</label>
+      <select [(ngModel)]="newsInput.categoryId" name="categoryId" required>
+        <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Content</label>
+      <textarea [(ngModel)]="newsInput.content" name="content" required rows="10"></textarea>
+    </div>
+
+    <button type="submit">{{ editingNewsId() ? 'Update' : 'Publish' }}</button>
+  </form>
+</div>

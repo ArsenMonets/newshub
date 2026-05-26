@@ -1,0 +1,72 @@
+<div class="home-grid">
+  <aside class="filters">
+    <section *ngIf="authService.user()">
+      <button 
+        (click)="toggleShowAll()"
+        [style.background]="showAll() ? '#3498db' : '#ecf0f1'"
+        [style.color]="showAll() ? 'white' : 'black'"
+        style="width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: none; border-radius: 4px; cursor: pointer;">
+        {{ showAll() ? 'Showing All' : 'Showing Subscribed' }}
+      </button>
+    </section>
+
+    <section>
+      <h3>Search</h3>
+      <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Search news...">
+    </section>
+
+    <section>
+      <h3>Categories</h3>
+      <div *ngFor="let cat of categories()">
+        <label style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="checkbox" [value]="cat.id" (change)="toggleCategory(cat.id)">
+          <span style="flex-grow: 1;">{{ cat.name }}</span>
+          <button 
+            *ngIf="authService.user()"
+            (click)="isSubscribedToCategory(cat.id) ? unsubscribeFromCategory(cat.id) : subscribeToCategory(cat.id)"
+            [style.background]="isSubscribedToCategory(cat.id) ? '#e74c3c' : '#e8f4f8'"
+            [style.color]="isSubscribedToCategory(cat.id) ? 'white' : '#3498db'"
+            style="padding: 0.2rem 0.5rem; font-size: 0.8rem; border: 1px solid #3498db; border-radius: 3px; cursor: pointer;">
+            {{ isSubscribedToCategory(cat.id) ? '-Sub' : '+Sub' }}
+          </button>
+        </label>
+      </div>
+    </section>
+
+    <section>
+      <h3>Authors</h3>
+      <div *ngFor="let author of authors()">
+        <label style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="checkbox" [value]="author.id" (change)="toggleAuthor(author.id)">
+          <span style="flex-grow: 1;">{{ author.login }}</span>
+          <button 
+            *ngIf="authService.user()"
+            (click)="isSubscribedToAuthor(author.id) ? unsubscribeFromAuthor(author.id) : subscribeToAuthor(author.id)"
+            [style.background]="isSubscribedToAuthor(author.id) ? '#e74c3c' : '#e8f4f8'"
+            [style.color]="isSubscribedToAuthor(author.id) ? 'white' : '#3498db'"
+            style="padding: 0.2rem 0.5rem; font-size: 0.8rem; border: 1px solid #3498db; border-radius: 3px; cursor: pointer;">
+            {{ isSubscribedToAuthor(author.id) ? '-Sub' : '+Sub' }}
+          </button>
+        </label>
+      </div>
+    </section>
+  </aside>
+
+  <div class="news-feed">
+    <div *ngFor="let news of newsItems()" class="news-card">
+      <span class="category-tag">{{ news.category.name }}</span>
+      <h2><a [routerLink]="['/news', news.id]">{{ news.title }}</a></h2>
+      <p>{{ news.summary }}</p>
+      <div class="meta">
+        <span>By {{ news.author.login }}</span>
+        <span>{{ news.createdAt | date:'medium' }}</span>
+      </div>
+    </div>
+    
+    <div class="pagination">
+      <button [disabled]="page() === 0" (click)="prevPage()">Prev</button>
+      <span>Page {{ page() + 1 }} of {{ totalPages() }}</span>
+      <button [disabled]="page() >= totalPages() - 1" (click)="nextPage()">Next</button>
+    </div>
+  </div>
+</div>
