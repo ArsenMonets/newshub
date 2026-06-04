@@ -6,5 +6,5 @@
 }
 .news-card:hover { background: #fcfcfc; }
 .category-tag { background: #3498db; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; }
-.meta { display: flex; justify-content: space-between; font-size: 0.9rem; color: #7f8c8d; margin-top: 1rem; }
+.meta { display: flex; justify-content: space-between; font-size: 0.9rem; color: #595959; margin-top: 1rem; }
 .pagination { margin-top: 2rem; display: flex; gap: 1rem; align-items: center; justify-content: center; }

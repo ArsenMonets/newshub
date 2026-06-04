@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthorAPI } from '../api/author.api';
@@ -14,9 +14,9 @@ import { CategoryDTO, NewsDTO } from '../models/models';
   styleUrls: ['../../static/create-news.component.css']
 })
 export class CreateNewsService {
-  private authorAPI = inject(AuthorAPI);
-  private newsAPI = inject(NewsAPI);
-  private router = inject(Router);
+  private readonly authorAPI = inject(AuthorAPI);
+  private readonly newsAPI = inject(NewsAPI);
+  private readonly router = inject(Router);
 
   newsInput = { title: '', content: '', categoryId: 0 };
   categories = signal<CategoryDTO[]>([]);
@@ -25,9 +25,9 @@ export class CreateNewsService {
   constructor() {
     this.newsAPI.getCategories().subscribe((c: CategoryDTO[]) => this.categories.set(c));
     
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state?.['news']) {
-      const news: NewsDTO = navigation.extras.state['news'];
+    const navigation = this.router.lastSuccessfulNavigation;
+    if (navigation()?.extras.state?.['news']) {
+      const news: NewsDTO = navigation()!.extras.state!['news'];
       this.editingNewsId.set(news.id);
       this.newsInput = {
         title: news.title,

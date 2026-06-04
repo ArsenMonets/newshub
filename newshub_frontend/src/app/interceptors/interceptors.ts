@@ -1,11 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { ErrorAPI } from '../api/error.api';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-  private errorService = inject(ErrorAPI);
+  private readonly errorService = inject(ErrorAPI);
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
@@ -24,6 +24,7 @@ export class ErrorInterceptor implements HttpInterceptor {
               errorMessage = error.error;
             }
           } catch (e) {
+            // Error intentionally not rethrown if parsing fails
             if (error.error.startsWith('<html') || error.error.startsWith('<!DOCTYPE')) {
               const method = req.method;
               const url = req.url.split('/').pop() || req.url;

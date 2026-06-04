@@ -6,8 +6,8 @@ import { CategoryDTO, UserDTO, Page } from '../models/models';
   providedIn: 'root'
 })
 export class AdminAPI {
-  private http = inject(HttpClient);
-  private baseUrl = '/api/v1/admin';
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = '/api/v1/admin';
 
   blockUser(userId: number) {
     return this.http.post<UserDTO>(`${this.baseUrl}/users/${userId}/block`, {});

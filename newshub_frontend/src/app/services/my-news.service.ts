@@ -14,10 +14,10 @@ import { NewsDTO } from '../models/models';
   styleUrls: ['../../static/my-news.component.css']
 })
 export class MyNewsService implements OnInit {
-  private newsAPI = inject(NewsAPI);
-  private authorAPI = inject(AuthorAPI);
-  private authAPI = inject(AuthAPI);
-  private router = inject(Router);
+  private readonly newsAPI = inject(NewsAPI);
+  private readonly authorAPI = inject(AuthorAPI);
+  private readonly authAPI = inject(AuthAPI);
+  private readonly router = inject(Router);
 
   myNews = signal<NewsDTO[]>([]);
   isLoading = signal(false);

@@ -7,10 +7,10 @@ import { tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthAPI {
-  private http = inject(HttpClient);
-  private baseUrl = '/api/v1/auth';
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = '/api/v1/auth';
   
-  private userSignal = signal<UserDTO | null>(this.getStoredUser());
+  private readonly userSignal = signal<UserDTO | null>(this.getStoredUser());
   user = this.userSignal.asReadonly();
 
   register(data: any) {

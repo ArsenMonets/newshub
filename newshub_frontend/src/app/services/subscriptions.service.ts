@@ -11,7 +11,7 @@ import { SubscriptionsDTO } from '../models/models';
   styleUrls: ['../../static/subscriptions.component.css']
 })
 export class SubscriptionsService implements OnInit {
-  private userAPI = inject(UserAPI);
+  private readonly userAPI = inject(UserAPI);
   subs = signal<SubscriptionsDTO | null>(null);
 
   ngOnInit() {
@@ -19,14 +19,23 @@ export class SubscriptionsService implements OnInit {
   }
 
   loadSubs() {
-    this.userAPI.getSubscriptions().subscribe((data: SubscriptionsDTO) => this.subs.set(data));
+    this.userAPI.getSubscriptions().subscribe({
+      next: (data: SubscriptionsDTO) => this.subs.set(data),
+      error: (err) => {}
+    });
   }
 
   unsubCat(id: number) {
-    this.userAPI.unsubscribeFromCategory(id).subscribe((data: SubscriptionsDTO) => this.subs.set(data));
+    this.userAPI.unsubscribeFromCategory(id).subscribe({
+      next: (data: SubscriptionsDTO) => this.subs.set(data),
+      error: (err) => {}
+    });
   }
 
   unsubAuthor(id: number) {
-    this.userAPI.unsubscribeFromAuthor(id).subscribe((data: SubscriptionsDTO) => this.subs.set(data));
+    this.userAPI.unsubscribeFromAuthor(id).subscribe({
+      next: (data: SubscriptionsDTO) => this.subs.set(data),
+      error: (err) => {}
+    });
   }
 }

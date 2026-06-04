@@ -12,8 +12,8 @@ import { Router } from '@angular/router';
   styleUrls: ['../../static/login.component.css']
 })
 export class LoginService {
-  private authAPI = inject(AuthAPI);
-  private router = inject(Router);
+  private readonly authAPI = inject(AuthAPI);
+  private readonly router = inject(Router);
 
   loginData = { login: '', password: '' };
   loading = signal(false);
@@ -38,8 +38,8 @@ export class LoginService {
   styleUrls: ['../../static/register.component.css']
 })
 export class RegisterService {
-  private authAPI = inject(AuthAPI);
-  private router = inject(Router);
+  private readonly authAPI = inject(AuthAPI);
+  private readonly router = inject(Router);
 
   regData = { login: '', email: '', password: '' };
   loading = signal(false);

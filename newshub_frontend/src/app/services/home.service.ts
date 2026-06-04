@@ -16,10 +16,10 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['../../static/home.component.css']
 })
 export class HomeService {
-  private newsAPI = inject(NewsAPI);
-  private userAPI = inject(UserAPI);
-  private wsAPI = inject(WebSocketAPI);
-  authService = inject(AuthAPI);
+  private readonly newsAPI = inject(NewsAPI);
+  private readonly userAPI = inject(UserAPI);
+  private readonly wsAPI = inject(WebSocketAPI);
+  readonly authService = inject(AuthAPI);
 
   newsItems = signal<NewsPreviewDTO[]>([]);
   categories = signal<CategoryDTO[]>([]);
@@ -40,8 +40,14 @@ export class HomeService {
   }
 
   loadInitialData() {
-    this.newsAPI.getCategories().subscribe((c: CategoryDTO[]) => this.categories.set(c));
-    this.newsAPI.getAuthors().subscribe((a: UserDTO[]) => this.authors.set(a));
+    this.newsAPI.getCategories().subscribe({
+      next: (c: CategoryDTO[]) => this.categories.set(c),
+      error: (err) => {}
+    });
+    this.newsAPI.getAuthors().subscribe({
+      next: (a: UserDTO[]) => this.authors.set(a),
+      error: (err) => {}
+    });
     
     // Завантажуємо підписки якщо користувач авторизований
     if (this.authService.user()) {
@@ -68,14 +74,20 @@ export class HomeService {
 
   loadNews() {
     if (this.searchQuery) {
-      this.newsAPI.searchNews(this.searchQuery, this.page()).subscribe((res: any) => {
-        this.newsItems.set(res.content);
-        this.totalPages.set(res.totalPages);
+      this.newsAPI.searchNews(this.searchQuery, this.page()).subscribe({
+        next: (res: any) => {
+          this.newsItems.set(res.content);
+          this.totalPages.set(res.totalPages);
+        },
+        error: (err) => {}
       });
     } else if (this.showAll() || !this.authService.user()) {
-      this.newsAPI.filterNews(this.selectedCategories, this.selectedAuthors, this.page()).subscribe((res: any) => {
-        this.newsItems.set(res.content);
-        this.totalPages.set(res.totalPages);
+      this.newsAPI.filterNews(this.selectedCategories, this.selectedAuthors, this.page()).subscribe({
+        next: (res: any) => {
+          this.newsItems.set(res.content);
+          this.totalPages.set(res.totalPages);
+        },
+        error: (err) => {}
       });
     } else {
       this.userAPI.getSubscriptions().subscribe({
@@ -89,13 +101,15 @@ export class HomeService {
             return;
           }
           
-          this.newsAPI.filterNews(categoryIds, authorIds, this.page()).subscribe((res: any) => {
-            this.newsItems.set(res.content);
-            this.totalPages.set(res.totalPages);
+          this.newsAPI.filterNews(categoryIds, authorIds, this.page()).subscribe({
+            next: (res: any) => {
+              this.newsItems.set(res.content);
+              this.totalPages.set(res.totalPages);
+            },
+            error: (err) => {}
           });
         },
         error: (err) => {
-          console.log('User not authenticated, showing empty news');
           this.newsItems.set([]);
           this.totalPages.set(0);
         }
@@ -150,26 +164,38 @@ export class HomeService {
   }
 
   subscribeToCategory(categoryId: number) {
-    this.userAPI.subscribeToCategory(categoryId).subscribe(() => {
-      this.subscribedCategoryIds.update(ids => [...ids, categoryId]);
+    this.userAPI.subscribeToCategory(categoryId).subscribe({
+      next: () => {
+        this.subscribedCategoryIds.update(ids => [...ids, categoryId]);
+      },
+      error: (err) => console.error('Error subscribing to category', err)
     });
   }
 
   unsubscribeFromCategory(categoryId: number) {
-    this.userAPI.unsubscribeFromCategory(categoryId).subscribe(() => {
-      this.subscribedCategoryIds.update(ids => ids.filter(id => id !== categoryId));
+    this.userAPI.unsubscribeFromCategory(categoryId).subscribe({
+      next: () => {
+        this.subscribedCategoryIds.update(ids => ids.filter(id => id !== categoryId));
+      },
+      error: (err) => console.error('Error unsubscribing from category', err)
     });
   }
 
   subscribeToAuthor(authorId: number) {
-    this.userAPI.subscribeToAuthor(authorId).subscribe(() => {
-      this.subscribedAuthorIds.update(ids => [...ids, authorId]);
+    this.userAPI.subscribeToAuthor(authorId).subscribe({
+      next: () => {
+        this.subscribedAuthorIds.update(ids => [...ids, authorId]);
+      },
+      error: (err) => console.error('Error subscribing to author', err)
     });
   }
 
   unsubscribeFromAuthor(authorId: number) {
-    this.userAPI.unsubscribeFromAuthor(authorId).subscribe(() => {
-      this.subscribedAuthorIds.update(ids => ids.filter(id => id !== authorId));
+    this.userAPI.unsubscribeFromAuthor(authorId).subscribe({
+      next: () => {
+        this.subscribedAuthorIds.update(ids => ids.filter(id => id !== authorId));
+      },
+      error: (err) => console.error('Error unsubscribing from author', err)
     });
   }
 

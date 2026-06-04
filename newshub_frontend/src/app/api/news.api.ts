@@ -6,8 +6,8 @@ import { CategoryDTO, NewsDTO, NewsPreviewDTO, Page, UserDTO } from '../models/m
   providedIn: 'root'
 })
 export class NewsAPI {
-  private http = inject(HttpClient);
-  private baseUrl = '/api/v1/public';
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = '/api/v1/public';
 
   searchNews(query: string, page: number = 0) {
     return this.http.get<Page<NewsPreviewDTO>>(`${this.baseUrl}/news/search`, {

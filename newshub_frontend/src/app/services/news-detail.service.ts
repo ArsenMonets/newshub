@@ -15,12 +15,12 @@ import { AuthAPI } from '../api/auth.api';
   styleUrls: ['../../static/news-detail.component.css']
 })
 export class NewsDetailService implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private newsAPI = inject(NewsAPI);
-  private userAPI = inject(UserAPI);
-  private authorAPI = inject(AuthorAPI);
-  authAPI = inject(AuthAPI);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly newsAPI = inject(NewsAPI);
+  private readonly userAPI = inject(UserAPI);
+  private readonly authorAPI = inject(AuthorAPI);
+  readonly authAPI = inject(AuthAPI);
 
   news = signal<NewsDTO | null>(null);
 

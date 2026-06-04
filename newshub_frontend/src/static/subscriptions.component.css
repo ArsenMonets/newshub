@@ -1,4 +1,4 @@
 .subs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
 .sub-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid #eee; margin-bottom: 0.5rem; border-radius: 4px; }
-button { color: #e74c3c; background: none; border: 1px solid #e74c3c; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; }
-button:hover { background: #e74c3c; color: white; }
+button { color: #c0392b; background: none; border: 1px solid #c0392b; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; }
+button:hover { background: #c0392b; color: white; }

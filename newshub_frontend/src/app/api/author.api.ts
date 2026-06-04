@@ -6,8 +6,8 @@ import { NewsDTO, NewsInputDTO } from '../models/models';
   providedIn: 'root'
 })
 export class AuthorAPI {
-  private http = inject(HttpClient);
-  private baseUrl = '/api/v1/author';
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = '/api/v1/author';
 
   createNews(data: NewsInputDTO) {
     return this.http.post<NewsDTO>(`${this.baseUrl}/news`, data);

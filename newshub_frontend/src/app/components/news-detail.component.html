@@ -9,8 +9,8 @@
     <div class="actions" *ngIf="authAPI.user()">
       <button (click)="subscribeToAuthor(n.author.id)">Follow Author</button>
       <button (click)="subscribeToCategory(n.category.id)">Subscribe to Category</button>
-      <button *ngIf="canEditOrDelete()" (click)="editNews()" style="background: #3498db; color: white;">Edit</button>
-      <button *ngIf="canEditOrDelete()" (click)="deleteNews()" style="background: #e74c3c; color: white;">Delete</button>
+      <button *ngIf="canEditOrDelete()" (click)="editNews()" style="background: #2980b9; color: white;">Edit</button>
+      <button *ngIf="canEditOrDelete()" (click)="deleteNews()" style="background: #c0392b; color: white;">Delete</button>
     </div>
   </header>
   

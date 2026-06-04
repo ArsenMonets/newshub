@@ -12,8 +12,8 @@ import { CategoryDTO, UserDTO, Page } from '../models/models';
   styleUrls: ['../../static/admin.component.css']
 })
 export class AdminService {
-  private adminAPI = inject(AdminAPI);
-  private newsAPI = inject(NewsAPI);
+  private readonly adminAPI = inject(AdminAPI);
+  private readonly newsAPI = inject(NewsAPI);
 
   categories = signal<CategoryDTO[]>([]);
   users = signal<UserDTO[]>([]);
@@ -76,7 +76,10 @@ export class AdminService {
   }
 
   deleteCategory(id: number) {
-    this.adminAPI.deleteCategory(id).subscribe(() => this.loadData());
+    this.adminAPI.deleteCategory(id).subscribe({
+      next: () => this.loadData(),
+      error: (err) => {}
+    });
   }
 
   toggleBlock(user: UserDTO, block: boolean) {

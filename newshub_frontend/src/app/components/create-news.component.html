@@ -2,20 +2,20 @@
   <h1>{{ editingNewsId() ? 'Edit News' : 'Create New News' }}</h1>
   <form (submit)="onCreate()">
     <div class="field">
-      <label>Title</label>
-      <input type="text" [(ngModel)]="newsInput.title" name="title" required>
+      <label for="news-title">Title</label>
+      <input id="news-title" type="text" [(ngModel)]="newsInput.title" name="title" required>
     </div>
     
     <div class="field">
-      <label>Category</label>
-      <select [(ngModel)]="newsInput.categoryId" name="categoryId" required>
+      <label for="news-category">Category</label>
+      <select id="news-category" [(ngModel)]="newsInput.categoryId" name="categoryId" required>
         <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
       </select>
     </div>
 
     <div class="field">
-      <label>Content</label>
-      <textarea [(ngModel)]="newsInput.content" name="content" required rows="10"></textarea>
+      <label for="news-content">Content</label>
+      <textarea id="news-content" [(ngModel)]="newsInput.content" name="content" required rows="10"></textarea>
     </div>
 
     <button type="submit">{{ editingNewsId() ? 'Update' : 'Publish' }}</button>

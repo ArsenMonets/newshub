@@ -6,8 +6,8 @@ import { SubscriptionsDTO } from '../models/models';
   providedIn: 'root'
 })
 export class UserAPI {
-  private http = inject(HttpClient);
-  private baseUrl = '/api/v1/user';
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = '/api/v1/user';
 
   subscribeToCategory(categoryId: number) {
     return this.http.post<SubscriptionsDTO>(`${this.baseUrl}/subscribe/category/${categoryId}`, {});

@@ -4,7 +4,7 @@ import { Injectable, signal } from '@angular/core';
   providedIn: 'root'
 })
 export class ErrorAPI {
-  private errorSignal = signal<string | null>(null);
+  private readonly errorSignal = signal<string | null>(null);
   
   error = this.errorSignal.asReadonly();
 
