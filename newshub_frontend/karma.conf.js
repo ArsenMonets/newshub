@@ -7,19 +7,16 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
+      require('karma-junit-reporter'), // 👈 ОБОВ'ЯЗКОВО ДОДАЄМО СЮДИ
       require('@angular-devkit/build-angular/plugins/karma')
     ],
     client: {
       jasmine: {
-        // you can add configuration options for Jasmine here
-        // the possible options are listed at https://jasmine.github.io/api/edge/Configuration.html
-        // for example, you can disable the random execution with `random: false`
-        // or set a specific seed with `seed: 4321`
       },
-      clearContext: false // leave Jasmine Spec Runner output visible in browser
+      clearContext: false 
     },
     jasmineHtmlReporter: {
-      suppressAll: true // removes the duplicated traces
+      suppressAll: true 
     },
     coverageReporter: {
       dir: require('path').join(__dirname, './coverage/newshub-frontend'),
@@ -30,7 +27,13 @@ module.exports = function (config) {
         { type: 'text-summary' }
       ]
     },
-    reporters: ['progress', 'kjhtml'],
+    reporters: ['progress', 'kjhtml', 'junit'],
+    
+    junitReporter: {
+      outputDir: require('path').join(__dirname, './coverage'), 
+      outputFile: 'junit-report.xml',
+      useBrowserName: false
+    },
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

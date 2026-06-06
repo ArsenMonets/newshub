@@ -79,6 +79,7 @@ jobs:
             -Dsonar.test.inclusions="**/*.spec.ts" \
             -Dsonar.exclusions="**/*.spec.ts,node_modules/**,src/main.ts,src/polyfills.ts" \
             -Dsonar.typescript.lcov.reportPaths=coverage/newshub-frontend/lcov.info \
+            -Dsonar.testExecutionReportPaths=coverage/junit-report.xml \
             -Dsonar.qualitygate.wait=true
 
       - name: Fetch Cloud Metrics and Generate Report
