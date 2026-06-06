@@ -79,3 +79,16 @@ jobs:
             -Dsonar.test.inclusions="**/*.spec.ts" \
             -Dsonar.exclusions="**/*.spec.ts, node_modules/**" \
             -Dsonar.typescript.lcov.reportPaths=coverage/**/lcov.info
+
+      - name: Fetch Cloud Metrics and Generate Report
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          chmod +x sonar-check.sh
+          ./sonar-check.sh
+          
+      - name: Upload Quality Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonarqube-cloud-report
+          path: sonar-report.md
