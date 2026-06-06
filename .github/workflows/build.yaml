@@ -50,14 +50,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           cd newshub_backend
-          # Додано -e для виведення детального стек-трейсу помилки, якщо вона станеться
           mvn -e verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
             -Dsonar.organization=arsenmonets \
             -Dsonar.projectKey=ArsenMonets_newshub_backend \
             -Dsonar.projectName="NewsHub Backend" \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.qualitygate.wait=true
 
       - name: Build and analyze Frontend
         env:
@@ -78,7 +78,8 @@ jobs:
             -Dsonar.tests=src \
             -Dsonar.test.inclusions="**/*.spec.ts" \
             -Dsonar.exclusions="**/*.spec.ts,node_modules/**,src/main.ts,src/polyfills.ts" \
-            -Dsonar.typescript.lcov.reportPaths=coverage/newshub-frontend/lcov.info
+            -Dsonar.typescript.lcov.reportPaths=coverage/newshub-frontend/lcov.info \
+            -Dsonar.qualitygate.wait=true
 
       - name: Fetch Cloud Metrics and Generate Report
         env:
