@@ -1,0 +1,125 @@
+<?xml version='1.0'?>
+<testExecutions version='1'>
+    <file path='src/app/services/home-integration.spec.ts'>
+        <testCase name='Home Integration (Data Loading) should show error message when categories fail to load' duration='234'/>
+        <testCase name='Home Integration (Data Loading) should correctly filter news and update state' duration='15'/>
+    </file>
+    <file path='src/app/services/app.service.spec.ts'>
+        <testCase name='AppService should be created' duration='25'/>
+        <testCase name='AppService should have errorAPI and authAPI injected' duration='6'/>
+    </file>
+    <file path='src/app/services/admin-integration.spec.ts'>
+        <testCase name='Admin Integration (User Management) should add a new category and refresh list' duration='51'/>
+        <testCase name='Admin Integration (User Management) should block user and update the users signal' duration='8'/>
+    </file>
+    <file path='src/app/services/register-integration.spec.ts'>
+        <testCase name='Auth Integration (Register) should register user and navigate to home page' duration='49'/>
+    </file>
+    <file path='src/app/services/subscriptions.service.spec.ts'>
+        <testCase name='SubscriptionsService should load subs on init' duration='18'/>
+        <testCase name='SubscriptionsService should call unsubscribeFromAuthor when unsubAuthor is called' duration='4'/>
+        <testCase name='SubscriptionsService should unsubscribe from category' duration='4'/>
+        <testCase name='SubscriptionsService should unsubscribe from author' duration='4'/>
+        <testCase name='SubscriptionsService should load subscriptions on loadSubs call' duration='4'/>
+    </file>
+    <file path='src/app/services/admin.service.spec.ts'>
+        <testCase name='AdminService should go to page' duration='4'/>
+        <testCase name='AdminService should not add category if name is empty' duration='4'/>
+        <testCase name='AdminService should cancel editing' duration='4'/>
+        <testCase name='AdminService should return user to user role' duration='4'/>
+        <testCase name='AdminService should start editing category' duration='4'/>
+        <testCase name='AdminService should delete category' duration='4'/>
+        <testCase name='AdminService should not delete category if handle error' duration='4'/>
+        <testCase name='AdminService should save edited category' duration='5'/>
+        <testCase name='AdminService should make author' duration='3'/>
+        <testCase name='AdminService should not save category if name is empty' duration='3'/>
+        <testCase name='AdminService should initialize with default pagination values' duration='3'/>
+        <testCase name='AdminService should toggle block user' duration='4'/>
+        <testCase name='AdminService should load users' duration='4'/>
+        <testCase name='AdminService should load categories on init' duration='4'/>
+        <testCase name='AdminService should load non admin users with current filters' duration='3'/>
+        <testCase name='AdminService should update user role to USER and update list' duration='5'/>
+        <testCase name='AdminService should add category' duration='3'/>
+        <testCase name='AdminService should update user list after blocking' duration='3'/>
+        <testCase name='AdminService should filter users' duration='4'/>
+    </file>
+    <file path='src/app/services/subscriptions-integration.spec.ts'>
+        <testCase name='Subscriptions Integration should load subscriptions on init' duration='8'/>
+        <testCase name='Subscriptions Integration should handle unsubscribe from author' duration='7'/>
+    </file>
+    <file path='src/app/services/news-detail.service.spec.ts'>
+        <testCase name='NewsDetailService should check if user can edit own news' duration='26'/>
+        <testCase name='NewsDetailService should load news details on init' duration='5'/>
+        <testCase name='NewsDetailService should allow admin to edit any news' duration='4'/>
+        <testCase name='NewsDetailService should delete news' duration='5'/>
+        <testCase name='NewsDetailService should not allow other users to edit' duration='5'/>
+        <testCase name='NewsDetailService should subscribe to author' duration='5'/>
+        <testCase name='NewsDetailService should navigate to edit' duration='4'/>
+        <testCase name='NewsDetailService should alert after subscribing to category' duration='3'/>
+        <testCase name='NewsDetailService should not allow non-logged user to edit' duration='3'/>
+    </file>
+    <file path='src/app/services/auth.service.spec.ts'>
+        <testCase name='AuthServices LoginService should handle login error' duration='11'/>
+        <testCase name='AuthServices LoginService should login and navigate' duration='3'/>
+        <testCase name='AuthServices LoginService should set loading to true while logging in' duration='2'/>
+        <testCase name='AuthServices RegisterService should initialize with empty regData' duration='2'/>
+        <testCase name='AuthServices RegisterService should handle register error' duration='4'/>
+        <testCase name='AuthServices RegisterService should set loading to true while registering' duration='3'/>
+        <testCase name='AuthServices RegisterService should register and navigate' duration='3'/>
+    </file>
+    <file path='src/app/services/news-detail-integration.spec.ts'>
+        <testCase name='NewsDetail Integration should load news details on init' duration='10'/>
+    </file>
+    <file path='src/app/services/my-news.service.spec.ts'>
+        <testCase name='MyNewsService should delete news after confirm' duration='24'/>
+        <testCase name='MyNewsService should not delete news if not confirmed' duration='4'/>
+        <testCase name='MyNewsService should reload news on loadMyNews call' duration='3'/>
+        <testCase name='MyNewsService should navigate to edit news' duration='4'/>
+        <testCase name='MyNewsService should load my news on init' duration='3'/>
+        <testCase name='MyNewsService should set isLoading while loading news' duration='4'/>
+    </file>
+    <file path='src/app/services/my-news-integration.spec.ts'>
+        <testCase name='MyNews Integration should load my news and delete one' duration='14'/>
+    </file>
+    <file path='src/app/services/login-integration.spec.ts'>
+        <testCase name='Auth Integration (Login) should login user and navigate to home page' duration='15'/>
+    </file>
+    <file path='src/app/services/create-news-integration.spec.ts'>
+        <testCase name='CreateNews Integration should load categories for form' duration='18'/>
+        <testCase name='CreateNews Integration should create news successfully' duration='9'/>
+    </file>
+    <file path='src/app/services/home.service.spec.ts'>
+        <testCase name='HomeService should add and remove authors via toggleAuthor' duration='4'/>
+        <testCase name='HomeService should load subscriptions if user logged in' duration='3'/>
+        <testCase name='HomeService should manage category subscriptions updates' duration='4'/>
+        <testCase name='HomeService should load news with search query' duration='3'/>
+        <testCase name='HomeService should add and remove categories via toggleCategory' duration='6'/>
+        <testCase name='HomeService should load initial data' duration='3'/>
+        <testCase name='HomeService should reset filters on toggleShowAll' duration='3'/>
+        <testCase name='HomeService should check subscriptions' duration='2'/>
+        <testCase name='HomeService should navigate pages via prevPage and nextPage within boundaries' duration='4'/>
+        <testCase name='HomeService should toggle showAll and load news' duration='3'/>
+        <testCase name='HomeService should manage author subscriptions updates' duration='3'/>
+        <testCase name='HomeService should handle onSearch correctly' duration='2'/>
+        <testCase name='HomeService should load user subscriptions correctly' duration='3'/>
+        <testCase name='HomeService should check if is subscribed to author' duration='3'/>
+        <testCase name='HomeService should clear news if no subscriptions found and user logged in' duration='3'/>
+        <testCase name='HomeService should load news based on active user subscriptions' duration='3'/>
+        <testCase name='HomeService should handle pagination' duration='3'/>
+        <testCase name='HomeService should load all news if not logged in' duration='3'/>
+    </file>
+    <file path='src/app/services/create-news.service.spec.ts'>
+        <testCase name='CreateNewsService should load categories' duration='3'/>
+        <testCase name='CreateNewsService should call createNews when no editing id' duration='3'/>
+        <testCase name='CreateNewsService should update newsInput from navigation extras' duration='4'/>
+        <testCase name='CreateNewsService should call updateNews when editing id exists' duration='3'/>
+        <testCase name='CreateNewsService should navigate back after edit' duration='3'/>
+    </file>
+    <file path='src/app/interceptors/interceptors.spec.ts'>
+        <testCase name='Interceptors AuthInterceptor should add Authorization header if token exists' duration='4'/>
+        <testCase name='Interceptors AuthInterceptor should NOT add Authorization header if no token' duration='3'/>
+        <testCase name='Interceptors ErrorInterceptor should parse JSON error messages' duration='3'/>
+        <testCase name='Interceptors ErrorInterceptor should catch string error and call ErrorAPI' duration='4'/>
+        <testCase name='Interceptors ErrorInterceptor should handle HTML error responses gracefully' duration='3'/>
+    </file>
+</testExecutions>

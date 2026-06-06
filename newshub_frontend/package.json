@@ -44,6 +44,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "karma-junit-reporter": "^2.0.1",
+    "karma-sonarqube-reporter": "^1.4.0",
     "rimraf": "^6.0.1",
     "sonarqube-scanner": "^4.2.3",
     "typescript": "~5.9.2"
