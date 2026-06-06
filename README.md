@@ -230,6 +230,34 @@ docker-compose up -d
 
 ```
 
+---
+
+## 📈 CI/CD Pipeline & SonarCloud Quality Metrics
+
+Every push to the `main` branch and each Pull Request is automatically tested and analyzed in the cloud. Below are the live code quality metrics updated in real-time directly from **SonarQube Cloud**.
+
+### ☕ NewsHub Backend Core
+
+| Metric | Badge | Analysis Link |
+| --- | --- | --- |
+| **Quality Gate** | [](https://sonarcloud.io/summary/new_code?id=ArsenMonets_newshub_backend) | [Project Overview](https://sonarcloud.io/summary/new_code?id=ArsenMonets_newshub_backend) |
+| **Code Coverage** | [](https://sonarcloud.io/component_measures?id=ArsenMonets_newshub_backend&metric=coverage) | [Coverage Analysis](https://sonarcloud.io/component_measures?id=ArsenMonets_newshub_backend&metric=coverage) |
+| **Unit Tests Count** | [](https://sonarcloud.io/component_measures?id=ArsenMonets_newshub_backend&metric=tests) | [Test Suites](https://sonarcloud.io/component_measures?id=ArsenMonets_newshub_backend&metric=tests) |
+| **Reliability (Bugs)** | [](https://sonarcloud.io/project/issues?id=ArsenMonets_newshub_backend&resolved=false&types=BUG) | [Bug Tracking List](https://sonarcloud.io/project/issues?id=ArsenMonets_newshub_backend&resolved=false&types=BUG) |
+| **Maintainability (Code Smells)** | [](https://sonarcloud.io/project/issues?id=ArsenMonets_newshub_backend&resolved=false&types=CODE_SMELL) | [Code Smells Review](https://sonarcloud.io/project/issues?id=ArsenMonets_newshub_backend&resolved=false&types=CODE_SMELL) |
+
+### 🅰️ NewsHub Frontend UI
+
+| Metric | Badge | Analysis Link |
+| --- | --- | --- |
+| **Quality Gate** | [](https://sonarcloud.io/summary/new_code?id=ArsenMonets_newshub_frontend) | [Project Overview](https://sonarcloud.io/summary/new_code?id=ArsenMonets_newshub_frontend) |
+| **Code Coverage** | [](https://sonarcloud.io/component_measures?id=ArsenMonets_newshub_frontend&metric=coverage) | [Coverage Analysis](https://sonarcloud.io/component_measures?id=ArsenMonets_newshub_frontend&metric=coverage) |
+| **Unit Tests Count** | [](https://sonarcloud.io/component_measures?id=ArsenMonets_newshub_frontend&metric=tests) | [Test Suites](https://sonarcloud.io/component_measures?id=ArsenMonets_newshub_frontend&metric=tests) |
+| **Reliability (Bugs)** | [](https://sonarcloud.io/project/issues?id=ArsenMonets_newshub_frontend&resolved=false&types=BUG) | [Bug Tracking List](https://sonarcloud.io/project/issues?id=ArsenMonets_newshub_frontend&resolved=false&types=BUG) |
+| **Maintainability (Code Smells)** | [](https://sonarcloud.io/project/issues?id=ArsenMonets_newshub_frontend&resolved=false&types=CODE_SMELL) | [Code Smells Review](https://sonarcloud.io/project/issues?id=ArsenMonets_newshub_frontend&resolved=false&types=CODE_SMELL) |
+
+> ℹ️ Clicking on any badge or link redirects you directly to the corresponding section of the project dashboard on SonarCloud for deep-dive log investigation and code line tracing.
+
 ### Active Networking Access Points
 
 * **Client App Application Hub (Angular + NGINX UI Gateway):** [http://localhost:4200](https://www.google.com/search?q=http://localhost:4200)
@@ -266,3 +294,4 @@ make restart  # Fast cycle restart of all infrastructure engine modules
 make clean    # Hard clean system environment of Docker residues left by the project
 
 ```
+
