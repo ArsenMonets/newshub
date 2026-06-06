@@ -1,50 +1,39 @@
-# 📰 NewsHub — Платформа дистрибуції контенту
+# 📰 NewsHub — Content Distribution Platform
 
-Сучасна вебплатформа, що побудована за архітектурним шаблоном розподіленого клієнт-серверного застосунку, призначена для публікації новин, гнучкого керування рольовим доступом користувачів та забезпечення інтерактивної взаємодії за допомогою трансляції подій у реальному часі.
+A modern web application built on a distributed client-server architecture. It is designed for news publishing, granular role-based access control, and highly interactive user engagement via real-time event broadcasting.
 
----
+## 🛠️ Production Tech Stack Specification
 
-## 👤 Інформація про автора
-
-- **Виконавець:** Монець А.В.
-- **Академічна група:** ФеП-32
-- **Науковий керівник:** Жишкович А.В., асистент
-- **Дата захисту / виконання:** 29.05.2026
-
----
-
-## 🛠️ Специфікація технологічного стека
-
-Проєкт реалізовано на базі виробничих технологій промислового рівня, які згруповано за компонентами системи:
+The system is engineered using industry-standard, enterprise-grade technologies partitioned across the application layers:
 - **Backend Core:** Java 17, Spring Boot (Spring Security + JWT, Spring Data JPA, Spring Web, Spring WebSockets)
-- **Frontend Core:** TypeScript, Angular Framework (RxJS, TailwindCSS, Сomponent Architecture)
-- **Data Tier:** PostgreSQL (Реляційна СКБД), Hibernate (ORM)
-- **DevOps & Infrastructure:** Docker, Docker Compose (Оркестрація контейнерів), Multi-stage Docker Builds
+- **Frontend Core:** TypeScript, Angular Framework (RxJS, TailwindCSS, Component Architecture)
+- **Data Tier:** PostgreSQL (Relational DBMS), Hibernate (ORM)
+- **DevOps & Infrastructure:** Docker, Docker Compose (Container Orchestration), Multi-stage Docker Builds
 
 ---
 
-## 📐 Архітектурне моделювання проекту
+## 📐 Architectural Modeling
 
-### 1. Функціональна модель: Діаграма прецедентів (Use Case Diagram)
-Відображає права доступу користувачів (Гість, Читач, Автор, Адміністратор) та логіку обов'язкового розширення бізнес-прецедентів через сервіс автентифікації.
+### 1. Functional Model: Use Case Diagram
+Illustrates system user privileges (Guest, Reader, Author, Administrator) and the mandatory extension of protected business logic use cases through the authentication service.
 
 ```mermaid
 graph TD
-    G[Гість]
-    R[Читач]
-    A[Автор]
-    ADM[Адміністратор]
+    G[Guest]
+    R[Reader]
+    A[Author]
+    ADM[Administrator]
 
     R --> G
     A --> R
     ADM --> A
 
-    UC1(Перегляд та фільтрація новин)
-    UC2(Реєстрація у системі)
-    UC3(Управління підписками)
-    UC4(Публікація та редактура статей)
-    UC5(Модерація контенту та блокування)
-    UC6(Генерація та перевірка JWT)
+    UC1(Browse & Filter News)
+    UC2(System Registration)
+    UC3(Manage Subscriptions)
+    UC4(Publish & Edit Articles)
+    UC5(Moderate Content & Restrict Users)
+    UC6(JWT Generation & Verification)
 
     G --> UC1
     G --> UC2
@@ -59,17 +48,18 @@ graph TD
 
 ```
 
-### 2. Структурна модель: Діаграма пакетів та патернів (Package Diagram)
+### 2. Structural Model: Package & Component Diagram
 
-Демонструє розшарування системи, застосування архітектурних патернів MVVM (на клієнті), MVC та Layered Architecture (на сервері), а також використання DTO для ізоляції сутностей бази даних.
+Demonstrates system layering, architectural design patterns (MVVM on the client side, MVC and Layered Architecture on the server side), and the use of DTOs to encapsulate database entities from external layers.
 
 ```mermaid
 graph LR
-    subgraph newshub_frontend [newshub_frontend /src/app/]
+    subgraph Angular_Client [newshub_frontend /src/app/]
         direction TB
         F_Comp[components]
         F_Serv[services]
         F_Api[api]
+        F_WS[websocket]
         F_Mod[models]
         
         F_Comp --> F_Serv
@@ -79,8 +69,9 @@ graph LR
         F_WS --> F_Mod
     end
 
-    subgraph newshub_backend [newshub_backend /src/main/java/...]
+    subgraph Spring_Boot_Server [newshub_backend /src/main/java/...]
         direction TB
+        B_Config[configs]
         B_Ctrl[controllers]
         B_WS[websocket]
         B_Serv[services]
@@ -93,32 +84,35 @@ graph LR
         B_Serv --> B_Repo
         B_Serv --> B_DTO
         B_Repo --> B_Mod
+        B_Config -.-> B_Ctrl
+        B_Config -.-> B_WS
     end
 
     subgraph Database_Tier [database]
-        DB[(PostgreSQL)]
+        DB[(PostgreSQL Database)]
     end
 
-    %% Мережеві зв'язки (Протоколи взаємодії)
-    F_Api -.->|HTTP REST| B_Ctrl
-    F_Api -.->|WS / STOMP| B_WS
+    %% Network Connections & Protocols
+    F_Api -.->|HTTP REST / JSON| B_Ctrl
+    F_WS -.->|WS / STOMP| B_WS
     B_Repo -.->|JDBC / SQL| DB
+
 ```
 
-### 3. Топологічна модель: Діаграма розгортання (Deployment Diagram)
+### 3. Topological Model: Deployment Diagram
 
-Описує фізичне середовище виконання проєкту та мережеві порти взаємодії між ізольованими Docker-контейнерами.
+Defines the physical execution environment of the deployment nodes, individual Docker containers, and the network communication protocols configured between them.
 
 ```mermaid
 graph TD
-    subgraph Client_Node [Вузол клієнта: Браузер]
+    subgraph Client_Node [Client Node: Web Browser]
         App[Angular Web Application]
     end
 
-    subgraph Server_Node [Серверний вузол: Docker Engine]
-        Web[Контейнер фронтенду: NGINX <br> Порт: 4200]
-        API[Контейнер бекенду: Spring Boot <br> Порт: 8080]
-        DB[(Контейнер БД: PostgreSQL <br> Порт: 5432)]
+    subgraph Server_Node [Server Node: Docker Engine]
+        Web[Frontend Container: NGINX <br> Port: 4200]
+        API[Backend Container: Spring Boot <br> Port: 8080]
+        DB[(Database Container: PostgreSQL <br> Port: 5432)]
     end
 
     App -- HTTP / Static Files --> Web
@@ -130,30 +124,79 @@ graph TD
 
 ---
 
-## 📂 Структурна організація монорепозиторію
+## 🧩 GoF (Gang of Four) Design Patterns Application
+
+The backend infrastructure utilizes fundamental GoF design patterns to achieve low loose coupling, robust maintainability, and clear separation of concerns.
+
+### 1. Decorator Pattern (Wrapper)
+
+**Intent:** Attaches additional responsibilities to an object dynamically without altering its structure or relying on heavy class inheritance.
+
+**Project Realization:** The `CustomUserDetails` class acts as a decorator for the core domain model `UserEntity`. The Spring Security framework mandates the `UserDetails` interface for managing core security abstractions (e.g., account expiration, locks). Instead of cluttering the clean `UserEntity` domain object with framework-specific infrastructure or building a fragile inheritance tree, we wrap it.
+
+* **Execution Logic:** `CustomUserDetails` receives a `UserEntity` reference via its constructor and delegates standard calls directly to it (e.g., `getUsername()` returns `user.getLogin()`). Concurrently, it adds custom behavior on top, such as mapping internal domain roles to Spring Security's `SimpleGrantedAuthority` format with a `"ROLE_"` prefix, and mapping account lock state dynamically (`!user.isBlocked()`).
+
+```mermaid
+graph LR
+    subgraph Spring Security Framework
+        UD[interface UserDetails]
+    end
+    
+    subgraph Domain Model
+        UE[UserEntity]
+    end
+
+    CUD[CustomUserDetails]
+    
+    CUD -.->|implements| UD
+    CUD -->|wraps / decorates| UE
 
 ```
-NewsHub/
-├── newshub_backend/          # Модуль серверної бізнес-логіки (Spring Boot)
-│   ├── src/main/java         # Вихідний код компонентів (Controller, Service, Repository)
-│   ├── src/main/resources    # Конфігураційні файли (application.yml)
-│   ├── pom.xml               # Декларація залежностей збірки Maven
-│   └── Dockerfile            # Інструкція багатоетапної збірки (JDK 17)
-├── newshub_frontend/         # Модуль клієнтського інтерфейсу (Angular)
-│   ├── src/app               # Модулі, компоненти та сервіси застосунку
-│   ├── package.json          # Конфігурація npm-пакетів та скриптів збірки
-│   └── Dockerfile            # Скрипт компіляції та розгортання под NGINX
-├── compose.yaml              # Головний файл оркестрації Docker Compose
-├── Makefile                  # Набір CLI-аліасів для розробника
-└── README.md                 # Технічна документація системи
+
+### 2. Observer Pattern (Publisher-Subscriber)
+
+**Intent:** Defines a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically.
+
+**Project Realization:** The event-driven WebSocket message broker infrastructure mirrors this pattern's behavior. `NewsService` operates as the **Subject (Publisher)**, while remote Angular web clients act as the **Observers (Subscribers)** listening to dedicated STOMP destination topics. The `NewsWebSocketController` behaves as the event dispatcher utilizing `SimpMessagingTemplate`.
+
+* **Execution Logic:** When state mutations occur inside `NewsService` (`create`, `update`, `delete`), the service triggers event broadcasts by invoking the respective controller methods (such as `sendNewsCreate()`). The controller asynchronously marshals and serializes the modified payload data (`NewsPreviewDTO` or entity IDs) over active WebSocket channels like `/topic/news/created` or `/topic/news/updated`. Connected web browsers catch these events and immediately update the user UI seamlessly without page refreshes.
+
+```mermaid
+graph TD
+    Publisher[NewsService <br> Event Publisher] -->|Triggers Action| Broker[NewsWebSocketController <br> Event Dispatcher / SimpMessagingTemplate]
+    
+    Broker -->|Broadcasts to /topic/news/*| Sub1[Angular Client 1 <br> Observer]
+    Broker -->|Broadcasts to /topic/news/*| Sub2[Angular Client 2 <br> Observer]
+    Broker -->|Broadcasts to /topic/news/*| Sub3[Angular Client N <br> Observer]
 
 ```
 
 ---
 
-## 🔑 Безпека та змінні оточення (.env)
+## 📂 Repository Layout & Monorepository Structure
 
-Для безпечного розгортання системи в колі проєкту перед запуском створюється файл `.env` із наступними ключовими параметрами конфігурації:
+```
+NewsHub/
+├── newshub_backend/          # Server-side Business Logic Layer (Spring Boot)
+│   ├── src/main/java         # Java Source Packages (Controllers, Services, Repositories)
+│   ├── src/main/resources    # Application Profiles & Configuration (application.yml)
+│   ├── pom.xml               # Maven Dependency Management Descriptor
+│   └── Dockerfile            # Multi-stage JVM Execution Build Script (JDK 17)
+├── newshub_frontend/         # Client-side Presentation Layer (Angular)
+│   ├── src/app               # Angular Application Shell (Components, Services, Modules)
+│   ├── package.json          # Node.js Package Dependencies & Scripts Descriptor
+│   └── Dockerfile            # Multi-stage SPA Web Compilation Script (NGINX Hosting)
+├── compose.yaml              # Core Infrastructure Docker Compose Orchestration Setup
+├── Makefile                  # Build Automation CLI Shortcuts
+└── README.md                 # Technical Documentation Sheet
+
+```
+
+---
+
+## 🔑 Configuration & Environment Variables (.env)
+
+For secure, production-grade deployment across decoupled environments, a `.env` configuration file must be declared in the root repository directory prior to engine startup:
 
 ```properties
 POSTGRES_DB=newshub_db
@@ -165,61 +208,61 @@ JWT_SECRET=super_secret_cryptographic_key_for_newshub_application
 
 ---
 
-## 🚀 Швидкий запуск інфраструктури
+## 🚀 Infrastructure Rapid Deployment
 
-### Системні вимоги до хост-машини
+### Host Machine Prerequisites
 
-* Наявність встановленого демона **Docker** (v20.10 або новіша)
-* Інструмент утиліти **Docker Compose** (v2.0 або новіша)
+* **Docker Engine** (v20.10 or newer) installed and running.
+* **Docker Compose CLI Utility** (v2.0 or newer) available.
 
-### Алгоритм розгортання
+### Deployment Workflow Steps
 
 ```bash
-# Крок 1. Клонування репозиторію проекту з GitHub
+# Step 1. Clone the repository workspace from GitHub
 git clone [https://github.com/your-user/NewsHub.git](https://github.com/your-user/NewsHub.git)
 cd NewsHub
 
-# Крок 2. Компіляція вихідного коду та побудова Docker-образів
+# Step 2. Trigger multi-stage environment builds and assemble target Docker images
 docker-compose build
 
-# Крок 3. Запуск усіх сервісів в ізольованому фоновому режимі (detached)
+# Step 3. Spin up all application network services in background detached mode
 docker-compose up -d
 
 ```
 
-### Мережеві адреси для перевірки працездатності
+### Active Networking Access Points
 
-* **Клієнтський UI (Angular + NGINX):** http://localhost:4200
-* **Серверний API (Spring Boot REST):** http://localhost:8080
-* **Системна база даних (PostgreSQL):** `localhost:5432`
+* **Client App Application Hub (Angular + NGINX UI Gateway):** [http://localhost:4200](https://www.google.com/search?q=http://localhost:4200)
+* **Core Engine Server Layer (Spring Boot REST Server):** [http://localhost:8080](https://www.google.com/search?q=http://localhost:8080)
+* **Relational Storage Core Instance (PostgreSQL Engine):** `localhost:5432`
 
 ---
 
-## 🛑 Сервісні команди зупинки та очищення
+## 🛑 Service Lifecycles, Teardown & Purging
 
 ```bash
-# Зупинка роботи застосунку зі збереженням стану бази даних
+# Shut down the operational stack safely while preserving persistent data volumes
 docker-compose down
 
-# Зупинка системи із повним видаленням баз даних (очищення томиків)
+# Shut down the operational stack completely and wipe database structures (drop volumes)
 docker-compose down -v
 
-# Комплексне видалення контейнерів, застарілих мереж та локальних образів
+# Hard system purge: remove containers, shared networks, and all cached project images
 docker-compose down -v --rmi all --remove-orphans
 
 ```
 
 ---
 
-## 🛠️ Використання автоматизації через `make`
+## 🛠️ Task Automation Shortcuts via `make`
 
-Утиліта `make` дозволяє欴 оптимізувати повсякденну роботу за допомогою вбудованих інструкцій з Makefile:
+An integrated `Makefile` is bundled in the workspace root to streamline daily local development operations via brief commands:
 
 ```bash
-make up       # Швидке розгортання та запуск інфраструктури
-make logs     # Безперервний вивід логів (stdout) усіх контейнерів у консоль
-make down     # Безпечне вимкнення серверного стеку
-make restart  # Швидкий перезапуск усіх модулів платформи
-make clean    # Повне системне очищення Docker від слідів проекту
+make up       # Rapidly provision, assemble, and launch stack infrastructure
+make logs     # Attach to and stream stdout log feeds from all executing containers
+make down     # Gracefully terminate operational server layers
+make restart  # Fast cycle restart of all infrastructure engine modules
+make clean    # Hard clean system environment of Docker residues left by the project
 
 ```
