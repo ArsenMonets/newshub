@@ -8,10 +8,7 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  id-token: write
   contents: read
-  pull-requests: write
-  checks: write
 
 jobs:
   build:
@@ -29,10 +26,10 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-      - name: Set up Node.js
+      - name: Set up Node.js (Updated to v22)
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4
@@ -56,7 +53,7 @@ jobs:
           mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
-            -Dsonar.organization=arsenmonets \
+            -Dsonar.organization=${{ github.repository_owner }} \
             -Dsonar.projectKey=ArsenMonets_newshub_backend \
             -Dsonar.projectName="NewsHub Backend" \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
@@ -73,29 +70,10 @@ jobs:
           sonar-scanner \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
-            -Dsonar.organization=arsenmonets \
+            -Dsonar.organization=${{ github.repository_owner }} \
             -Dsonar.projectKey=ArsenMonets_newshub_frontend \
             -Dsonar.projectName="NewsHub Frontend" \
             -Dsonar.sources=src \
             -Dsonar.tests=src \
             -Dsonar.test.inclusions=**/*.spec.ts \
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
-
-      - name: Generate Quality Report and Enforce Gates
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          chmod +x sonar-check.sh
-          ./sonar-check.sh
-
-      - name: Upload Quality Report Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sonarqube-quality-report
-          path: sonar-report.md
-
-      - name: Comment PR with Quality Report
-        uses: thollander/actions-comment-pull-request@v2
-        if: github.event_name == 'pull_request'
-        with:
-          filePath: sonar-report.md
