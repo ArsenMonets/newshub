@@ -36,13 +36,15 @@ module.exports = function (config) {
     reporters: ['progress', 'kjhtml', 'sonarqube'],
 
     // 2. Звіт про кількість тестів відправляємо в ІНШУ ізольовану папку
+    // 🎯 Специфічні налаштування для генерації ПРАВИЛЬНОГО формату SonarCloud
     sonarqubeReporter: {
       basePath: 'src',
-      outputFolder: require('path').join(__dirname, './coverage-sonar/tests-report'), // 👈 окрема підпапка
+      outputFolder: require('path').join(__dirname, './coverage-sonar/tests-report'),
       filePattern: '**/*.spec.ts',
       encoding: 'utf-8',
-      outputFile: 'sonar-spec-reporter.xml',
-      legacyMode: false
+      outputFile: 'sonar-spec-reporter.xml', // 👈 Повертаємо фіксовану назву файлу!
+      sonarQubeVersion: 'LATEST',            // 👈 Вказуємо сучасний формат
+      legacyMode: 'no'                       // 👈 Вимикаємо старий формат тегів
     },
     
     port: 9876,
