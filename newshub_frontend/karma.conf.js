@@ -21,30 +21,30 @@ module.exports = function (config) {
       suppressAll: true 
     },
     
-    // 1. Покриття коду відправляємо в окрему ізольовану папку
     coverageReporter: {
       dir: require('path').join(__dirname, './coverage-sonar/lcov-report'),
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'lcovonly' }, // генерує lcov.info
+        { type: 'lcovonly' }, 
         { type: 'text-summary' }
       ]
     },
     
-    // Активуємо обидва репортери
     reporters: ['progress', 'kjhtml', 'sonarqube'],
 
-    // 2. Звіт про кількість тестів відправляємо в ІНШУ ізольовану папку
-    // 🎯 Специфічні налаштування для генерації ПРАВИЛЬНОГО формату SonarCloud
     sonarqubeReporter: {
       basePath: 'src',
       outputFolder: require('path').join(__dirname, './coverage-sonar/tests-report'),
       filePattern: '**/*.spec.ts',
       encoding: 'utf-8',
-      outputFile: 'sonar-spec-reporter.xml', // 👈 Повертаємо фіксовану назву файлу!
-      sonarQubeVersion: 'LATEST',            // 👈 Вказуємо сучасний формат
-      legacyMode: 'no'                       // 👈 Вимикаємо старий формат тегів
+      
+      outputFile: 'sonar-spec-reporter.xml',
+      useBrowserName: false, 
+      
+      sonarQubeVersion: 'LATEST',
+      legacyMode: false,
+      testReportName: 'testExecutions' 
     },
     
     port: 9876,
@@ -52,10 +52,9 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: false,
     browsers: ['ChromeHeadless'],
-    singleRun: true, // 👈 КРИТИЧНО для CI: Karma чекає завершення обох плагінів
+    singleRun: true, 
     restartOnFileChange: false,
     
-    // Даємо асинхронним плагінам час записати файли на диск
     browserNoActivityTimeout: 30000,
     browserDisconnectTimeout: 10000,
     pingTimeout: 10000

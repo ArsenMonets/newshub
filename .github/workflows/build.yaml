@@ -66,7 +66,8 @@ jobs:
           cd newshub_frontend
           npm ci
           npm run test -- --watch=false --code-coverage --browsers=ChromeHeadless
-          
+          mv coverage-sonar/tests-report/*.xml coverage-sonar/tests-report/sonar-spec-reporter.xml
+
           npm install -g sonarqube-scanner
           sonar-scanner \
             -Dsonar.host.url=https://sonarcloud.io \
@@ -79,6 +80,7 @@ jobs:
             -Dsonar.test.inclusions="**/*.spec.ts" \
             -Dsonar.exclusions="**/*.spec.ts,node_modules/**,src/main.ts,src/polyfills.ts" \
             -Dsonar.typescript.lcov.reportPaths=coverage-sonar/lcov-report/lcov.info \
+            -Dsonar.testExecutionReportPaths=coverage-sonar/tests-report/sonar-spec-reporter.xml \
             -Dsonar.qualitygate.wait=true
 
       - name: Fetch Cloud Metrics and Generate Report
@@ -99,7 +101,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage-html
-          path: newshub_frontend/coverage/newshub-frontend/
+          path: newshub_frontend/coverage-sonar/lcov-report/
           if-no-files-found: warn
 
       - name: Upload Backend Coverage Report (HTML)
