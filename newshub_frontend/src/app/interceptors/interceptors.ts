@@ -15,7 +15,6 @@ export class ErrorInterceptor implements HttpInterceptor {
         if (error.error instanceof ErrorEvent) {
           errorMessage = `Client-side error: ${error.error.message}`;
         } else if (typeof error.error === 'string') {
-          // Спробуємо парсити як JSON
           try {
             const parsed = JSON.parse(error.error);
             if (parsed.message) {
@@ -24,7 +23,6 @@ export class ErrorInterceptor implements HttpInterceptor {
               errorMessage = error.error;
             }
           } catch (e) {
-            // Error intentionally not rethrown if parsing fails
             if (error.error.startsWith('<html') || error.error.startsWith('<!DOCTYPE')) {
               const method = req.method;
               const url = req.url.split('/').pop() || req.url;

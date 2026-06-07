@@ -39,12 +39,10 @@ export class CreateNewsService {
 
   onCreate() {
     if (this.editingNewsId()) {
-      // Редагування існуючого посту
       this.authorAPI.updateNews(this.editingNewsId()!, this.newsInput).subscribe(() => {
         this.router.navigate(['/']);
       });
     } else {
-      // Створення нового посту
       this.authorAPI.createNews(this.newsInput).subscribe(() => {
         this.router.navigate(['/']);
       });

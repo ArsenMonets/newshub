@@ -10,7 +10,6 @@ export class ErrorAPI {
 
   setError(message: string) {
     this.errorSignal.set(message);
-    // Auto-clear after 5 seconds
     setTimeout(() => this.clearError(), 5000);
   }
 

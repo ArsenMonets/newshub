@@ -49,7 +49,6 @@ export class HomeService {
       error: (err) => {}
     });
     
-    // Завантажуємо підписки якщо користувач авторизований
     if (this.authService.user()) {
       this.loadUserSubscriptions();
     }
@@ -201,7 +200,6 @@ export class HomeService {
 
   private setupWebSockets() {
     this.wsAPI.newsCreated$.subscribe(news => {
-      // Logic: Only add if current query/filter might include it (simplified: always add if no active filters)
       if (!this.searchQuery && this.page() === 0) {
         this.newsItems.update(items => [news, ...items].slice(0, 10));
       }

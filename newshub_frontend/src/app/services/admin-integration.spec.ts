@@ -31,7 +31,6 @@ describe('Admin Integration (User Management)', () => {
   });
 
   it('should block user and update the users signal', () => {
-    // Satisfy initial data load in constructor
     httpMock.expectOne('/api/v1/public/categories').flush([]);
     httpMock.expectOne(req => req.url.includes('/api/v1/admin/users')).flush({ content: [{ id: 1, login: 'user1', isBlocked: false }], totalElements: 1 });
 
@@ -47,7 +46,6 @@ describe('Admin Integration (User Management)', () => {
   });
 
   it('should add a new category and refresh list', () => {
-    // constructor load
     httpMock.expectOne('/api/v1/public/categories').flush([]);
     httpMock.expectOne(req => req.url.includes('/api/v1/admin/users')).flush({ content: [], totalElements: 0 });
 
@@ -56,7 +54,6 @@ describe('Admin Integration (User Management)', () => {
     const addReq = httpMock.expectOne(req => req.method === 'POST' && req.url === '/api/v1/admin/categories' && req.params.get('name') === 'Technology');
     addReq.flush({ id: 1, name: 'Technology' });
 
-    // Refresh load after add
     httpMock.expectOne('/api/v1/public/categories').flush([{ id: 1, name: 'Technology' }]);
     httpMock.expectOne(req => req.url.includes('/api/v1/admin/users')).flush({ content: [], totalElements: 0 });
 

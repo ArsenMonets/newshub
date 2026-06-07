@@ -35,10 +35,8 @@ describe('MyNews Integration', () => {
     const authAPI = TestBed.inject(AuthAPI);
     (authAPI as any).user = signal(user);
 
-    // Initial load in ngOnInit
     fixture.detectChanges(); 
     
-    // Catch the initial filter request
     const req = httpMock.expectOne(request => request.url.includes('/api/v1/public/news/filter'));
     req.flush({ content: [{ id: 1, title: 'My News' }], totalPages: 1 });
 

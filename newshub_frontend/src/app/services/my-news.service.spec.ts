@@ -18,7 +18,6 @@ describe('MyNewsService', () => {
     newsSpy = jasmine.createSpyObj('NewsAPI', ['filterNews', 'getNewsDetails']);
     authorSpy = jasmine.createSpyObj('AuthorAPI', ['deleteNews']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    // @ts-ignore
     authSpy = { user: () => ({ id: 1 }) };
 
     newsSpy.filterNews.and.returnValue(of({ content: [] }));

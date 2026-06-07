@@ -28,7 +28,6 @@ describe('CreateNews Integration', () => {
   afterEach(() => httpMock.verify());
 
   it('should load categories for form', () => {
-    // Constructor triggers categories load
     const catReq = httpMock.expectOne('/api/v1/public/categories');
     catReq.flush([{ id: 1, name: 'Tech' }]);
     

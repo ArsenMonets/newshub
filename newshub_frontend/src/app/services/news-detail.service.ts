@@ -35,10 +35,8 @@ export class NewsDetailService implements OnInit {
     
     if (!currentUser || !newsAuthor) return false;
     
-    // Адміни можуть редагувати/видаляти всі пости
     if (currentUser.role === 'ADMIN') return true;
-    
-    // Автори можуть редагувати/видаляти тільки свої пости
+   
     return currentUser.id === newsAuthor.id;
   }
 
